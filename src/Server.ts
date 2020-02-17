@@ -8,7 +8,15 @@ const port = 8000
 
 SocketManager.setupConnection();
 
-app.listen(port, () => console.log(`Server started at http://localhost:${port}!`))
+app.listen(process.env.PORT || port, () => {
+
+  let baseUrl = process.env.BASE_URL || ("localhost:"+port);
+  if (baseUrl.indexOf("http://") === -1 && baseUrl.indexOf("https://") === -1) {
+    baseUrl = 'https://' + baseUrl
+  }
+
+  console.log('Web server listening at: %s', baseUrl);
+})
 
 app.get('/sse', function(req, res) {
   res.writeHead(200, {
