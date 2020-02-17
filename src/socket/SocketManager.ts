@@ -26,7 +26,8 @@ class SocketManagerClass {
   }
 
   setupConnection() {
-    this.socket = io('http://localhost:4500', { transports: ['websocket'], autoConnect: true});
+    console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"])
+    this.socket = io(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"], { transports: ['websocket'], autoConnect: true});
 
     this.socket.on("connect",             () => { console.log("connected") })
     this.socket.on("reconnect_attempt",   () => {
@@ -37,7 +38,7 @@ class SocketManagerClass {
 
     this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
       let hasher = crypto.createHash('sha256');
-      let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex')
+      let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex');
       callback(output)
 
       this.socket.removeAllListeners("event");
@@ -45,6 +46,7 @@ class SocketManagerClass {
     });
 
     this.socket.on('disconnect', () => {
+      console.log("Disconnect")
       this.reconnectAfterCloseTimeout = setTimeout(() => {
         this.socket.removeAllListeners()
         // on disconnect, all events are destroyed so we can just re-initialize.

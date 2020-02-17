@@ -24,7 +24,8 @@ class SocketManagerClass {
         this.reconnectCounter = 0;
     }
     setupConnection() {
-        this.socket = socket_io_client_1.default('http://localhost:4500', { transports: ['websocket'], autoConnect: true });
+        console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"]);
+        this.socket = socket_io_client_1.default(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"], { transports: ['websocket'], autoConnect: true });
         this.socket.on("connect", () => { console.log("connected"); });
         this.socket.on("reconnect_attempt", () => {
             this.reconnectCounter += 1;
@@ -39,6 +40,7 @@ class SocketManagerClass {
             this.socket.on(protocolTopics.event, (data) => { EventDispatcher_1.EventDispatcher.dispatch(data); });
         });
         this.socket.on('disconnect', () => {
+            console.log("Disconnect");
             this.reconnectAfterCloseTimeout = setTimeout(() => {
                 this.socket.removeAllListeners();
                 // on disconnect, all events are destroyed so we can just re-initialize.
