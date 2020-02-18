@@ -74,9 +74,12 @@
           }
           else {
             textArea.innerText = "Starting...";
-            var source = new EventSource("https://events.crownstone.rocks/sse?accessToken=" + token);
+            let source = new EventSource("/sse?accessToken=" + token);
+            source.onopen = function(event) {
+              textArea.innerHTML = "Ready! Messages will come in as events are triggered!\n"
+            };
             source.onmessage = function(event) {
-              textArea.innerHTML += event.data + "<br>";
+              textArea.innerHTML += event.data + "\n";
             };
             source.onerror = function(event) {
               textArea.innerHTML = "There was an error... Check your console for more information."
