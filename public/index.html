@@ -84,7 +84,7 @@
               textArea.innerHTML = "Ready! Messages will come in as events are triggered!\n"
             };
             eventSource.onmessage = function(event) {
-              textArea.innerHTML += event.data + "\n";
+              textArea.innerHTML = new Date().toLocaleString() + ": \n" + JSON.stringify(JSON.parse(event.data), null, 2) + "\n\n" + textArea.innerHTML;
             };
             eventSource.onerror = function(event) {
               textArea.innerHTML = "There was an error... Check your console for more information."
