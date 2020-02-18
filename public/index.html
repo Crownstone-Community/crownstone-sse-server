@@ -63,7 +63,7 @@
         }
     </style>
     <script>
-
+        let eventSource = null;
 
         function execute() {
           let token = document.getElementById("token").value;
@@ -74,14 +74,17 @@
           }
           else {
             textArea.innerText = "Starting...";
-            let source = new EventSource("/sse?accessToken=" + token);
-            source.onopen = function(event) {
+            if (eventSource !== null) {
+              eventSource.close();
+            }
+            eventSource = new EventSource("/sse?accessToken=" + token);
+            eventSource.onopen = function(event) {
               textArea.innerHTML = "Ready! Messages will come in as events are triggered!\n"
             };
-            source.onmessage = function(event) {
+            eventSource.onmessage = function(event) {
               textArea.innerHTML += event.data + "\n";
             };
-            source.onerror = function(event) {
+            eventSource.onerror = function(event) {
               textArea.innerHTML = "There was an error... Check your console for more information."
             };
           }

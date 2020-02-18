@@ -8,7 +8,7 @@ export const EventGenerator = {
       code:     200,
       message: "Stream Starting."
     };
-    return JSON.stringify(startEvent);
+    return "data:" + JSON.stringify(startEvent) + '\n\n';
   },
 
   getErrorEvent(code, message) : string {
@@ -17,6 +17,6 @@ export const EventGenerator = {
       code:     code,
       message: message,
     };
-    return JSON.stringify(startEvent);
+    return "data:" + JSON.stringify(startEvent) + '\n\n';
   }
 }
