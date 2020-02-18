@@ -14,6 +14,7 @@ app.listen(process.env.PORT || port, () => {
     }
     console.log('Web server listening at: %s', baseUrl);
 });
+app.use("/", express.static('public'));
 app.get('/sse', function (req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/event-stream',
