@@ -11,14 +11,41 @@
             height:100%;
             background-color: #f1f1f1;
         }
-        .grid-container {
-            flex-grow:1;
-            display: grid;
-            grid-template-rows: 250px auto;
-            grid-template-columns: 1fr 900px 1fr;
-            grid-template-areas:
-                    "header header header"
-                    "Lpadding content Rpadding";
+
+
+        @media (min-width: 501px) {
+            .grid-container {
+                flex-grow: 1;
+                display: grid;
+                grid-template-rows: 200px auto;
+                grid-template-areas: "header" "content";
+            }
+            pre {
+                white-space: normal;
+            }
+        }
+        @media (min-width: 900px) {
+            .grid-container {
+                flex-grow: 1;
+                display: grid;
+                grid-template-rows: 150px auto;
+                grid-template-columns: 0.1fr 10fr 0.1fr;
+                grid-template-areas: "header header header" "Lpadding content Rpadding";
+            }
+            pre {
+                white-space: pre;
+            }
+        }
+
+
+        @media (min-width: 1200px) {
+            .grid-container {
+                flex-grow: 1;
+                display: grid;
+                grid-template-rows: 250px auto;
+                grid-template-columns: 1fr 900px 1fr;
+                grid-template-areas: "header header header" "Lpadding content Rpadding";
+            }
         }
         .gheader {
             grid-area: header;
@@ -30,8 +57,10 @@
         }
         .gcontent {
             grid-area: content;
+            display: inline-block;
+            width:inherit;
+            min-height: 100vh;
             background-color: white;
-
             padding:30px
         }
 
@@ -61,6 +90,8 @@
         #token {
             width:50%
         }
+
+
     </style>
 
     <link rel="icon" href="./img/favicon.ico">
@@ -99,7 +130,6 @@
         <div class="backgroundText"></div>
     </div>
     <div class="gcontent">
-        <br />
         <article class="markdown-body">
             <h1>Welcome to the Crownstone Event server!</h1>
             <br />
@@ -125,12 +155,12 @@
             <pre>https://cloud.crownstone.rocks/api/Stones/{id}/setSwitchstateRemotely</pre>
             <p>More will follow soon though!</p>
             <br />
+
             <h1>Live Example</h1>
             <p>Your access token: <input id="token" /> <button onclick="execute()">Press me to start!</button></p>
             <p>
                 <textarea id="exampleContent">Output will be shown here!</textarea>
             </p>
-
         </article>
     </div>
 
