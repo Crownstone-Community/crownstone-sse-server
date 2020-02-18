@@ -22,9 +22,10 @@ app.use("/", express.static('public'))
 
 app.get('/sse', function(req, res) {
   res.writeHead(200, {
+    'Connection': 'keep-alive',
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    'X-Accel-Buffering': 'no'
   });
 
   const accessToken = req.query.accessToken;
@@ -50,6 +51,5 @@ app.get('/sse', function(req, res) {
       console.log("err", err)
       res.end(err);
     })
-
 })
 
