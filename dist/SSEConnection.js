@@ -30,7 +30,7 @@ class SSEConnection {
         if (this._checkIfTokenIsExpired()) {
             return this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "Token Expired."));
         }
-        this.transmit(dataStringified);
+        this.transmit("data:" + dataStringified + "\n\n");
     }
     transmit(data) {
         this.response.write(data);

@@ -41,7 +41,7 @@ export class SSEConnection {
       return this.destroy(EventGenerator.getErrorEvent(401, "Token Expired."));
     }
 
-    this.transmit(dataStringified);
+    this.transmit("data:" + dataStringified + "\n\n");
   }
 
   transmit(data : string) {
