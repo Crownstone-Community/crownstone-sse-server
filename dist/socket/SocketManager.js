@@ -26,7 +26,7 @@ class SocketManagerClass {
     setupConnection() {
         console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"]);
         this.socket = socket_io_client_1.default(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"], { transports: ['websocket'], autoConnect: true });
-        this.socket.on("connect", () => { console.log("connected"); });
+        this.socket.on("connect", () => { console.log("Connected to Crownstone SSE Server host."); });
         this.socket.on("reconnect_attempt", () => {
             this.reconnectCounter += 1;
             clearTimeout(this.reconnectAfterCloseTimeout);

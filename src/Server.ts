@@ -1,10 +1,11 @@
 import {EventGenerator} from "./EventGenerator";
 import {EventDispatcher} from "./EventDispatcher";
 import {SocketManager} from "./socket/SocketManager";
+const helmet = require('helmet')
 
-const express = require('express')
-const app = express()
-const port = 8000
+const express = require('express');
+const app = express();
+const port = 8000;
 
 SocketManager.setupConnection();
 
@@ -19,6 +20,7 @@ app.listen(process.env.PORT || port, () => {
 })
 
 app.use("/", express.static('public'))
+app.use(helmet());
 
 app.get('/sse', function(req, res) {
   res.writeHead(200, {

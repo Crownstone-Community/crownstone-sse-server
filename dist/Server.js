@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const EventGenerator_1 = require("./EventGenerator");
 const EventDispatcher_1 = require("./EventDispatcher");
 const SocketManager_1 = require("./socket/SocketManager");
+const helmet = require('helmet');
 const express = require('express');
 const app = express();
 const port = 8000;
@@ -15,6 +16,7 @@ app.listen(process.env.PORT || port, () => {
     console.log('Web server listening at: %s', baseUrl);
 });
 app.use("/", express.static('public'));
+app.use(helmet());
 app.get('/sse', function (req, res) {
     res.writeHead(200, {
         'Connection': 'keep-alive',
