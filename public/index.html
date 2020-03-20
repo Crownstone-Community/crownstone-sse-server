@@ -152,14 +152,9 @@
 
             <h2>What sort of events do I get?</h2>
             <p>- Remote switches, caused by invocation of:</p>
-            <pre>       https://cloud.crownstone.rocks/api/Stones/{id}/setSwitchstateRemotely</pre>
-            <p>- Changes in presence, caused by change in location. This can be triggered by the invocation of the following endpoinds.
-                Keep in mind that the events are fired <b>on change</b>, not on every invocation!</p>
-            <pre>       https://cloud.crownstone.rocks/api/Device/{id}/inLocation</pre>
-            <pre>       https://cloud.crownstone.rocks/api/Device/{id}/exitLocation</pre>
-            <pre>       https://cloud.crownstone.rocks/api/Device/{id}/inSphere</pre>
-            <pre>       https://cloud.crownstone.rocks/api/Device/{id}/exitSphere</pre>
-            <p>More will follow soon!</p>
+            <p>- Changes in presence, caused by change in location. Keep in mind that the events are fired <b>on change</b>, not on every update!</p>
+            <p>- Changes in data of Spheres, Crownstones, Locations and Sphere Users. This does <b>not</b> include changes in power usage or switchstate.</p>
+            <p>More is available here: <a href="https://github.com/crownstone/bluenet-nodejs-lib-sse" target="_blank">on this repo</a>!</p>
             <br />
 
             <h1>Live Example</h1>

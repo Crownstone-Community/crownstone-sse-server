@@ -1,3 +1,5 @@
+/// <reference path="./declarations/declarations.d.ts" />
+
 import {EventGenerator} from "./EventGenerator";
 import {EventDispatcher} from "./EventDispatcher";
 import {SocketManager} from "./socket/SocketManager";
