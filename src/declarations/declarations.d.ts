@@ -43,18 +43,25 @@ interface PresenceLocationEvent {
   location: LocationData,
 }
 
+interface DataChangeEvent {
+  type:        "dataChange",
+  subType:     "user"   | "spheres" | "stones" | "locations",
+  operation:   "create" | "delete"  | "update"
+  sphere:      SphereData,
+  changedItem: NameIdSet,
+}
 
 interface NameIdSet {
   id:   string,
   name: string
 }
-interface UserData       extends NameIdSet {}
 interface SphereData     extends NameIdSet {
   uid: number
 }
+interface UserData       extends NameIdSet {}
 interface LocationData   extends NameIdSet {}
 interface CrownstoneData extends NameIdSet {
-  switchState: number,
+  switchState: number | null,
   macAddress: string,
   uid: number,
 }
