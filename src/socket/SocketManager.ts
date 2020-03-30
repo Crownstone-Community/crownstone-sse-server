@@ -5,6 +5,7 @@ import {EventDispatcher} from "../EventDispatcher";
 const RETRY_TIMEOUT = 5000; // ms
 
 const protocolTopics = {
+  requestForOauthTokenCheck:  "requestForOauthTokenCheck",
   requestForAccessTokenCheck: "requestForAccessTokenCheck",
   authenticationRequest: "authenticationRequest",
   event: "event",
@@ -33,7 +34,6 @@ class SocketManagerClass {
     this.socket.on("reconnect_attempt",   () => {
       this.reconnectCounter += 1;
       clearTimeout( this.reconnectAfterCloseTimeout );
-      console.log("reconnect_attempt", this.reconnectCounter);
     })
 
     this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
@@ -46,7 +46,6 @@ class SocketManagerClass {
     });
 
     this.socket.on('disconnect', () => {
-      console.log("Disconnect")
       this.reconnectAfterCloseTimeout = setTimeout(() => {
         this.socket.removeAllListeners()
         // on disconnect, all events are destroyed so we can just re-initialize.
@@ -61,7 +60,7 @@ class SocketManagerClass {
     return this.socket.connected;
   }
 
-  isValidAccessToken(token: string) : Promise<AccessModel | false>{
+  _isValidToken(token, requestType) : Promise<AccessModel | false> {
     return new Promise((resolve, reject) => {
 
       // in case we can not get the token resolved in time, timeout.
@@ -72,7 +71,7 @@ class SocketManagerClass {
       }, 3000);
 
       // request the token to be checked, and a accessmodel returned
-      this.socket.emit(protocolTopics.requestForAccessTokenCheck, token, (reply) => {
+      this.socket.emit(requestType, token, (reply) => {
         clearTimeout(tokenValidityCheckTimeout);
         // if we have already timed out, ignore any response.
         if (responseValid === false) { return; }
@@ -89,6 +88,14 @@ class SocketManagerClass {
         }
       })
     })
+  }
+
+  isValidAccessToken(token: string) : Promise<AccessModel | false>{
+    return this._isValidToken(token, protocolTopics.requestForAccessTokenCheck);
+  }
+
+  isValidOauthToken(token: string) : Promise<AccessModel | false>{
+    return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
   }
 
 }

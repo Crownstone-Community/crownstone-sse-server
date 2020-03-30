@@ -101,7 +101,7 @@
         function execute() {
           let token = document.getElementById("token").value;
           let textArea = document.getElementById("exampleContent")
-          if (token.length < 64) {
+          if (token.length != 32 && token.length != 64) {
             textArea.innerText = "That isn't a valid token...";
             return
           }
@@ -111,14 +111,16 @@
               eventSource.close();
             }
             eventSource = new EventSource("/sse?accessToken=" + token);
-            eventSource.onopen = function(event) {
+            eventSource.onopen = function() {
               textArea.innerHTML = "Ready! Messages will come in as events are triggered!\n"
             };
             eventSource.onmessage = function(event) {
               textArea.innerHTML = new Date().toLocaleString() + ": \n" + JSON.stringify(JSON.parse(event.data), null, 2) + "\n\n" + textArea.innerHTML;
             };
             eventSource.onerror = function(event) {
-              textArea.innerHTML = "There was an error... Check your console for more information."
+              console.log("close", JSON.stringify(event))
+              textArea.innerHTML = new Date().toLocaleString() + ": \n" + "There was an error. Connection is closed.\n\n" + textArea.innerHTML;
+              eventSource.close();
             };
           }
         }

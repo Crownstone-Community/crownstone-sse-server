@@ -4,14 +4,16 @@ exports.EventGenerator = {
     getStartEvent() {
         let startEvent = {
             type: "system",
+            subType: "STREAM_START",
             code: 200,
             message: "Stream Starting."
         };
         return "data:" + JSON.stringify(startEvent) + '\n\n';
     },
-    getErrorEvent(code, message) {
+    getErrorEvent(code, subType, message) {
         let startEvent = {
             type: "system",
+            subType: subType,
             code: code,
             message: message,
         };

@@ -12,11 +12,19 @@ interface AccessModel {
   userId: string,
   spheres: {
     [key: string] : { boolean }
-  }
+  },
+  scopes: string[]
 }
+
+type SseEvent = SwitchCrownstoneEvent |
+                PresenceSphereEvent   |
+                PresenceLocationEvent |
+                DataChangeEvent       |
+                InvitationChangeEvent
 
 interface SystemEvent {
   type:    "system",
+  subType:  "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED",
   code:     number,
   message:  string,
 }

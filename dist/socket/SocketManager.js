@@ -8,6 +8,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const EventDispatcher_1 = require("../EventDispatcher");
 const RETRY_TIMEOUT = 5000; // ms
 const protocolTopics = {
+    requestForOauthTokenCheck: "requestForOauthTokenCheck",
     requestForAccessTokenCheck: "requestForAccessTokenCheck",
     authenticationRequest: "authenticationRequest",
     event: "event",
@@ -30,7 +31,6 @@ class SocketManagerClass {
         this.socket.on("reconnect_attempt", () => {
             this.reconnectCounter += 1;
             clearTimeout(this.reconnectAfterCloseTimeout);
-            console.log("reconnect_attempt", this.reconnectCounter);
         });
         this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
             let hasher = crypto_1.default.createHash('sha256');
@@ -40,7 +40,6 @@ class SocketManagerClass {
             this.socket.on(protocolTopics.event, (data) => { EventDispatcher_1.EventDispatcher.dispatch(data); });
         });
         this.socket.on('disconnect', () => {
-            console.log("Disconnect");
             this.reconnectAfterCloseTimeout = setTimeout(() => {
                 this.socket.removeAllListeners();
                 // on disconnect, all events are destroyed so we can just re-initialize.
@@ -53,7 +52,7 @@ class SocketManagerClass {
     isConnected() {
         return this.socket.connected;
     }
-    isValidAccessToken(token) {
+    _isValidToken(token, requestType) {
         return new Promise((resolve, reject) => {
             // in case we can not get the token resolved in time, timeout.
             let responseValid = true;
@@ -62,7 +61,7 @@ class SocketManagerClass {
                 reject(errors.couldNotVerifyToken);
             }, 3000);
             // request the token to be checked, and a accessmodel returned
-            this.socket.emit(protocolTopics.requestForAccessTokenCheck, token, (reply) => {
+            this.socket.emit(requestType, token, (reply) => {
                 var _a, _b, _c;
                 clearTimeout(tokenValidityCheckTimeout);
                 // if we have already timed out, ignore any response.
@@ -80,6 +79,12 @@ class SocketManagerClass {
                 }
             });
         });
+    }
+    isValidAccessToken(token) {
+        return this._isValidToken(token, protocolTopics.requestForAccessTokenCheck);
+    }
+    isValidOauthToken(token) {
+        return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
     }
 }
 exports.SocketManager = new SocketManagerClass();

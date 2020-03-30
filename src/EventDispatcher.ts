@@ -8,8 +8,7 @@ interface ClientMap {
 
 class EventDispatcherClass {
 
-  clients : ClientMap = {};
-  listOfStreams = [];
+  clients    : ClientMap  = {};
   routingMap : RoutingMap = null;
 
   constructor() {
@@ -19,16 +18,16 @@ class EventDispatcherClass {
   /**
    * This is where the data is pushed from the socket connection with the Crownstone cloud.
    * From here it should be distributed to the enduser.
-   * @param data
+   * @param eventData
    */
-  dispatch(data) {
-    let sphereId = data?.sphere?.id;
+  dispatch(eventData : SseEvent) {
+    let sphereId = eventData?.sphere?.id;
     let clientIdArray = this.routingMap.all[sphereId];
 
     if (sphereId && clientIdArray && clientIdArray.length > 0) {
-      let perparedData = JSON.stringify(data);
+      let preparedEventString = JSON.stringify(eventData);
       for (let i = 0; i < clientIdArray.length; i++) {
-        this.clients[clientIdArray[i]].dispatch(perparedData, data)
+        this.clients[clientIdArray[i]].dispatch(preparedEventString, eventData)
       }
     }
   }
@@ -58,7 +57,7 @@ class EventDispatcherClass {
 
     // allocate variables for use in loops.
     let clientId = null;
-    let client = null;
+    let client   = null;
     let sphereId = null;
 
     let clientIds = Object.keys(this.clients);

@@ -27,15 +27,22 @@ app.get('/sse', function (req, res) {
     });
     const accessToken = req.query.accessToken;
     if (!accessToken) {
-        res.end(EventGenerator_1.EventGenerator.getErrorEvent(401, "No accessToken provided..."));
+        res.end(EventGenerator_1.EventGenerator.getErrorEvent(400, "NO_ACCESS_TOKEN", "No accessToken provided..."));
     }
     if (SocketManager_1.SocketManager.isConnected() === false) {
-        res.end(EventGenerator_1.EventGenerator.getErrorEvent(500, "Not connected to cloud service. Try again later..."));
+        res.end(EventGenerator_1.EventGenerator.getErrorEvent(500, "NO_CONNECTION", "Not connected to cloud service. Try again later..."));
     }
-    SocketManager_1.SocketManager.isValidAccessToken(accessToken)
+    let validationPromise;
+    if (accessToken.length > 32) {
+        validationPromise = SocketManager_1.SocketManager.isValidAccessToken(accessToken);
+    }
+    else {
+        validationPromise = SocketManager_1.SocketManager.isValidOauthToken(accessToken);
+    }
+    validationPromise
         .then((validationResult) => {
         if (validationResult === false) {
-            return res.end(EventGenerator_1.EventGenerator.getErrorEvent(401, "No valid accessToken provided..."));
+            return res.end(EventGenerator_1.EventGenerator.getErrorEvent(400, "NO_ACCESS_TOKEN", "No valid accessToken provided..."));
         }
         else {
             res.write(EventGenerator_1.EventGenerator.getStartEvent());

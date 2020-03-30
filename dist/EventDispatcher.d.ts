@@ -5,15 +5,14 @@ interface ClientMap {
 }
 declare class EventDispatcherClass {
     clients: ClientMap;
-    listOfStreams: any[];
     routingMap: RoutingMap;
     constructor();
     /**
      * This is where the data is pushed from the socket connection with the Crownstone cloud.
      * From here it should be distributed to the enduser.
-     * @param data
+     * @param eventData
      */
-    dispatch(data: any): void;
+    dispatch(eventData: SseEvent): void;
     addClient(accessToken: string, request: Request, response: Response, accessModel: AccessModel): void;
     _clearRoutingMap(): void;
     _refreshLists(): void;

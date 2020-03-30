@@ -5,23 +5,22 @@ const SSEConnection_1 = require("./SSEConnection");
 class EventDispatcherClass {
     constructor() {
         this.clients = {};
-        this.listOfStreams = [];
         this.routingMap = null;
         this._clearRoutingMap();
     }
     /**
      * This is where the data is pushed from the socket connection with the Crownstone cloud.
      * From here it should be distributed to the enduser.
-     * @param data
+     * @param eventData
      */
-    dispatch(data) {
+    dispatch(eventData) {
         var _a, _b;
-        let sphereId = (_b = (_a = data) === null || _a === void 0 ? void 0 : _a.sphere) === null || _b === void 0 ? void 0 : _b.id;
+        let sphereId = (_b = (_a = eventData) === null || _a === void 0 ? void 0 : _a.sphere) === null || _b === void 0 ? void 0 : _b.id;
         let clientIdArray = this.routingMap.all[sphereId];
         if (sphereId && clientIdArray && clientIdArray.length > 0) {
-            let perparedData = JSON.stringify(data);
+            let preparedEventString = JSON.stringify(eventData);
             for (let i = 0; i < clientIdArray.length; i++) {
-                this.clients[clientIdArray[i]].dispatch(perparedData, data);
+                this.clients[clientIdArray[i]].dispatch(preparedEventString, eventData);
             }
         }
     }

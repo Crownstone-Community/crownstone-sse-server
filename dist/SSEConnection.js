@@ -6,6 +6,7 @@ class SSEConnection {
         this.accessToken = null;
         this.accessModel = null;
         this.queryFilter = {};
+        this.scopeFilter = {};
         this.request = null;
         this.response = null;
         this.keepAliveTimer = null;
@@ -25,23 +26,86 @@ class SSEConnection {
             // this.response.flush()
         }, 30000);
         if (this._checkIfTokenIsExpired()) {
-            this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "Token Expired."));
+            this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
             return;
         }
-        this.request.once('close', () => { this.destroy(); });
+        // generate a filter based on the scope permissions.
+        this.generateFilterFromScope();
+        this.request.once('close', () => { this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(408, "STREAM_CLOSED", "Event stream has been closed.")); });
+    }
+    generateFilterFromScope() {
+        if (this.accessModel.scopes.indexOf("all") !== -1) {
+            this.scopeFilter = true;
+            return;
+        }
+        if (this.accessModel.scopes.indexOf("user_location") !== -1) {
+            if (this.scopeFilter["presence"] === undefined) {
+                this.scopeFilter["presence"] = {};
+            }
+            this.scopeFilter["presence"]["all"] = (eventData) => { return eventData.user.id === this.accessModel.userId; };
+        }
+        if (this.accessModel.scopes.indexOf("stone_information") !== -1) {
+            if (this.scopeFilter["dataChange"] === undefined) {
+                this.scopeFilter["dataChange"] = {};
+            }
+            this.scopeFilter["dataChange"]["stones"] = () => true;
+        }
+        if (this.accessModel.scopes.indexOf("sphere_information") !== -1) {
+            if (this.scopeFilter["dataChange"] === undefined) {
+                this.scopeFilter["dataChange"] = {};
+            }
+            this.scopeFilter["dataChange"]["stones"] = () => true;
+            this.scopeFilter["dataChange"]["locations"] = () => true;
+            this.scopeFilter["dataChange"]["spheres"] = () => true;
+        }
+        if (this.accessModel.scopes.indexOf("switch_stone") !== -1) {
+            if (this.scopeFilter["command"] === undefined) {
+                this.scopeFilter["command"] = {};
+            }
+            this.scopeFilter["command"]["switchCrownstone"] = () => true;
+        }
+        if (this.accessModel.scopes.indexOf("location_information") !== -1) {
+            if (this.scopeFilter["dataChange"] === undefined) {
+                this.scopeFilter["dataChange"] = {};
+            }
+            this.scopeFilter["dataChange"]["locations"] = () => true;
+        }
+        // if (this.accessModel.scopes.indexOf("power_consumption") !== -1) {}
+        // if (this.accessModel.scopes.indexOf("user_information") !== -1) {}
+        // if (this.accessModel.scopes.indexOf("user_id")          !== -1) {}
     }
     destroy(message = "") {
         clearInterval(this.keepAliveTimer);
         this.response.end(message);
         this.cleanCallback();
     }
-    dispatch(dataStringified, data) {
+    dispatch(dataStringified, eventData) {
         if (this._checkIfTokenIsExpired()) {
-            return this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "Token Expired."));
+            return this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
         }
-        this.transmit("data:" + dataStringified + "\n\n");
+        if (this.checkScopePermissions(eventData)) {
+            this._transmit("data:" + dataStringified + "\n\n");
+        }
     }
-    transmit(data) {
+    checkScopePermissions(eventData) {
+        if (this.scopeFilter['all']) {
+            return true;
+        }
+        let typeFilter = this.scopeFilter[eventData.type];
+        if (typeFilter) {
+            if (typeFilter["all"] !== undefined) {
+                return typeFilter["all"](eventData);
+            }
+            else {
+                let subType = eventData.subType || eventData.operation;
+                if (typeFilter[subType] !== undefined) {
+                    return typeFilter[subType](eventData);
+                }
+            }
+        }
+        return false;
+    }
+    _transmit(data) {
         this.response.write(data);
         // if we are going to use the compression lib for express, we need to flush after a write.
         // this.response.flush()
