@@ -111,7 +111,7 @@ export class SSEConnection {
   }
 
   checkScopePermissions(eventData) : boolean {
-    if (this.scopeFilter['all']) {
+    if (this.scopeFilter === true) {
       return true;
     }
 
