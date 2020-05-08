@@ -88,7 +88,7 @@ class SSEConnection {
         }
     }
     checkScopePermissions(eventData) {
-        if (this.scopeFilter['all']) {
+        if (this.scopeFilter === true) {
             return true;
         }
         let typeFilter = this.scopeFilter[eventData.type];

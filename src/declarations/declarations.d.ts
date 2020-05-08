@@ -20,7 +20,8 @@ type SseEvent = SwitchCrownstoneEvent |
                 PresenceSphereEvent   |
                 PresenceLocationEvent |
                 DataChangeEvent       |
-                InvitationChangeEvent
+                InvitationChangeEvent |
+                SwitchStateUpdateEvent
 
 interface SystemEvent {
   type:    "system",
@@ -54,7 +55,7 @@ interface PresenceLocationEvent {
 interface DataChangeEvent {
   type:        "dataChange",
   subType:     "users"   | "spheres" | "stones" | "locations",
-  operation:   "create" | "delete"  | "update"
+  operation:   "create"  | "delete"  | "update"
   sphere:      SphereData,
   changedItem: NameIdSet,
 }
@@ -64,6 +65,12 @@ interface InvitationChangeEvent {
   operation:   "invited" | "invitationRevoked"
   sphere:      SphereData,
   email:       string,
+}
+interface SwitchStateUpdateEvent {
+  type:        'switchStateUpdate',
+  subtype:     'stone',
+  sphere:       SphereData,
+  crownstone:   CrownstoneData,
 }
 
 interface NameIdSet {
