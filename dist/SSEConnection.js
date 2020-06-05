@@ -23,7 +23,7 @@ class SSEConnection {
             // since we start this message with a colon (:), the client will not see it as a message.
             this.response.write(':ping\n\n');
             // if we are going to use the compression lib for express, we need to flush after a write.
-            // this.response.flush()
+            this.response.flush();
         }, 30000);
         if (this._checkIfTokenIsExpired()) {
             this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
@@ -108,7 +108,7 @@ class SSEConnection {
     _transmit(data) {
         this.response.write(data);
         // if we are going to use the compression lib for express, we need to flush after a write.
-        // this.response.flush()
+        this.response.flush();
     }
     _checkIfTokenIsExpired() {
         return new Date().valueOf() >= this.expirationDate;

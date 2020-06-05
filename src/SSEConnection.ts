@@ -36,7 +36,7 @@ export class SSEConnection {
       this.response.write(':ping\n\n');
 
       // if we are going to use the compression lib for express, we need to flush after a write.
-      // this.response.flush()
+      this.response.flush()
     }, 30000);
 
     if (this._checkIfTokenIsExpired()) {
@@ -134,7 +134,7 @@ export class SSEConnection {
   _transmit(data : string) {
     this.response.write(data);
     // if we are going to use the compression lib for express, we need to flush after a write.
-    // this.response.flush()
+    this.response.flush()
   }
 
 
