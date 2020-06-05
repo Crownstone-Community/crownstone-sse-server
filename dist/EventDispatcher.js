@@ -26,7 +26,7 @@ class EventDispatcherClass {
     }
     addClient(accessToken, request, response, accessModel) {
         let uuid = util_1.Util.getUUID();
-        this.clients[uuid] = new SSEConnection_1.SSEConnection(accessToken, request, response, accessModel, () => { delete this.clients[uuid]; this._refreshLists(); });
+        this.clients[uuid] = new SSEConnection_1.SSEConnection(accessToken, request, response, accessModel, uuid, () => { delete this.clients[uuid]; this._refreshLists(); });
         this._refreshLists();
     }
     _clearRoutingMap() {

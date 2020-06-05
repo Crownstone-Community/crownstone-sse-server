@@ -39,6 +39,7 @@ class EventDispatcherClass {
       request,
       response,
       accessModel,
+      uuid,
       () => { delete this.clients[uuid]; this._refreshLists(); }
     );
     this._refreshLists();

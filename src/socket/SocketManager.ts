@@ -76,7 +76,6 @@ class SocketManagerClass {
         // if we have already timed out, ignore any response.
         if (responseValid === false) { return; }
 
-
         if (reply?.code !== 200) {
           reject(errors.invalidToken);
         }

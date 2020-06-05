@@ -13,8 +13,9 @@ export declare class SSEConnection {
     response: Response;
     keepAliveTimer: any;
     expirationDate: any;
+    uuid: any;
     cleanCallback: () => void;
-    constructor(accessToken: string, request: Request, response: Response, accessModel: AccessModel, cleanCallback: () => void);
+    constructor(accessToken: string, request: Request, response: Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void);
     generateFilterFromScope(): void;
     destroy(message?: string): void;
     dispatch(dataStringified: string, eventData: SseEvent): void;

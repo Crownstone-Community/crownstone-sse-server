@@ -18,15 +18,17 @@ export class SSEConnection {
   keepAliveTimer = null;
 
   expirationDate = null;
+  uuid = null;
 
   cleanCallback : () => void = null;
 
-  constructor(accessToken : string, request: Request, response : Response, accessModel: AccessModel, cleanCallback: () => void) {
-    this.accessToken = accessToken;
-    this.accessModel = accessModel;
-    this.request     = request;
-    this.response    = response;
+  constructor(accessToken : string, request: Request, response : Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void) {
+    this.accessToken   = accessToken;
+    this.accessModel   = accessModel;
+    this.request       = request;
+    this.response      = response;
     this.cleanCallback = cleanCallback;
+    this.uuid          = uuid;
 
     this.expirationDate = new Date(accessModel.createdAt).valueOf() + 1000*accessModel.ttl;
 
@@ -36,8 +38,7 @@ export class SSEConnection {
       this.response.write(':ping\n\n');
 
       // if we are going to use the compression lib for express, we need to flush after a write.
-      // @ts-ignore
-      this.response.flush()
+      this.response.flushHeaders()
     }, 30000);
 
     if (this._checkIfTokenIsExpired()) {
@@ -135,8 +136,7 @@ export class SSEConnection {
   _transmit(data : string) {
     this.response.write(data);
     // if we are going to use the compression lib for express, we need to flush after a write.
-    // @ts-ignore
-    this.response.flush()
+    this.response.flushHeaders()
   }
 
 
