@@ -18,6 +18,19 @@ app.listen(process.env.PORT || port, () => {
 });
 app.use("/", express.static('public'));
 app.use(helmet());
+app.get('/debug', function (req, res) {
+    let validationToken = process.env.DEBUG_TOKEN || "debug";
+    if (req.query.token === validationToken) {
+        let debugInformation = {
+            connected: SocketManager_1.SocketManager.isConnected(),
+            amountOfConnections: Object.keys(EventDispatcher_1.EventDispatcher.clients).length
+        };
+        res.end(JSON.stringify(debugInformation));
+    }
+    else {
+        res.end("Invalid token.");
+    }
+});
 app.get('/sse', function (req, res) {
     res.writeHead(200, {
         'Connection': 'keep-alive',
