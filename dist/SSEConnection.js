@@ -33,7 +33,9 @@ class SSEConnection {
         }
         // generate a filter based on the scope permissions.
         this.generateFilterFromScope();
-        this.request.once('close', () => { this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(408, "STREAM_CLOSED", "Event stream has been closed.")); });
+        this.request.once('close', () => {
+            this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(408, "STREAM_CLOSED", "Event stream has been closed."));
+        });
     }
     generateFilterFromScope() {
         if (this.accessModel.scopes.indexOf("all") !== -1) {

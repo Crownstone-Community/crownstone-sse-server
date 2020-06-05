@@ -39,6 +39,9 @@ app.get('/debug', function(req, res) {
 })
 
 app.get('/sse', function(req, res) {
+  let cancelled = false;
+  req.once('close', () => { cancelled = true; });
+
   res.writeHead(200, {
     'Connection': 'keep-alive',
     'Content-Type': 'text/event-stream',
@@ -65,6 +68,9 @@ app.get('/sse', function(req, res) {
 
   validationPromise
     .then((validationResult) => {
+      // if the connection is cancelled before it is validated, do not start the connection
+      if (cancelled) { return res.end(); }
+
       if (validationResult === false) {
         return res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No valid accessToken provided..."));
       }
