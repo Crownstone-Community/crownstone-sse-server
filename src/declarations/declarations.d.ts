@@ -60,6 +60,14 @@ interface DataChangeEvent {
   changedItem: NameIdSet,
 }
 
+interface AbilityChangeEvent {
+  type:        "abilityChange",
+  subType:     "dimming"   | "switchcraft" | "tapToToggle",
+  sphere:      SphereData,
+  stone:       CrownstoneData,
+  ability:     AbilityData
+}
+
 interface InvitationChangeEvent {
   type:        "invitationChange",
   operation:   "invited" | "invitationRevoked"
@@ -86,6 +94,12 @@ interface CrownstoneData extends NameIdSet {
   switchState: number | null,
   macAddress: string,
   uid: number,
+}
+
+interface AbilityData {
+  type: string,
+  enabled: boolean,
+  syncedToCrownstone: boolean,
 }
 
 

@@ -69,7 +69,9 @@ export class SSEConnection {
 
     if (this.accessModel.scopes.indexOf("stone_information") !== -1) {
       if (this.scopeFilter["dataChange"] === undefined) { this.scopeFilter["dataChange"] = {}; }
-      this.scopeFilter["dataChange"]["stones"] = () => true;
+      this.scopeFilter["dataChange"]["stones"]       = () => true;
+      this.scopeFilter["abilityChange"]["all"]       = () => true;
+      this.scopeFilter["switchStateUpdate"]["stone"] = () => true;
     }
 
 
@@ -93,8 +95,12 @@ export class SSEConnection {
     }
 
 
+    if (this.accessModel.scopes.indexOf("user_information") !== -1) {
+      this.scopeFilter["dataChange"]["users"] = (eventData) => { return eventData.user.id === this.accessModel.userId; }
+    }
+
+
     // if (this.accessModel.scopes.indexOf("power_consumption") !== -1) {}
-    // if (this.accessModel.scopes.indexOf("user_information") !== -1) {}
     // if (this.accessModel.scopes.indexOf("user_id")          !== -1) {}
   }
 
