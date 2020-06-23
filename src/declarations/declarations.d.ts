@@ -16,12 +16,16 @@ interface AccessModel {
   scopes: string[]
 }
 
-type SseEvent = SwitchCrownstoneEvent |
-                PresenceSphereEvent   |
-                PresenceLocationEvent |
-                DataChangeEvent       |
-                InvitationChangeEvent |
-                SwitchStateUpdateEvent
+type SseEvent = SystemEvent                 |
+                  SwitchStateUpdateEvent    |
+                  SwitchCrownstoneEvent     |
+                  SphereTokensUpdatedEvent  |
+                  PresenceSphereEvent       |
+                  PresenceLocationEvent     |
+                  DataChangeEvent           |
+                  AbilityChangeEvent        |
+                  InvitationChangeEvent
+
 
 interface SystemEvent {
   type:    "system",
@@ -58,6 +62,13 @@ interface DataChangeEvent {
   operation:   "create"  | "delete"  | "update"
   sphere:      SphereData,
   changedItem: NameIdSet,
+}
+
+interface SphereTokensUpdatedEvent {
+  type:        "sphereTokensChanged",
+  subType:     "sphereAuthorizationTokens",
+  operation:   "update"
+  sphere:      SphereData,
 }
 
 interface AbilityChangeEvent {
