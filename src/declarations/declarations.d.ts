@@ -16,16 +16,21 @@ interface AccessModel {
   scopes: string[]
 }
 
-type SseEvent = SystemEvent                 |
-                  SwitchStateUpdateEvent    |
-                  SwitchCrownstoneEvent     |
-                  SphereTokensUpdatedEvent  |
-                  PresenceSphereEvent       |
-                  PresenceLocationEvent     |
-                  DataChangeEvent           |
-                  AbilityChangeEvent        |
-                  InvitationChangeEvent
+type SseEvent = SseSystemEvent | SseDataEvent
+type SseSystemEvent = SystemEvent | PingEvent
+type SseDataEvent =       SwitchStateUpdateEvent    |
+                          SwitchCrownstoneEvent     |
+                          SphereTokensUpdatedEvent  |
+                          PresenceSphereEvent       |
+                          PresenceLocationEvent     |
+                          DataChangeEvent           |
+                          AbilityChangeEvent        |
+                          InvitationChangeEvent
 
+interface PingEvent {
+  type:    "ping",
+  counter:  number,
+}
 
 interface SystemEvent {
   type:    "system",
@@ -35,10 +40,17 @@ interface SystemEvent {
 }
 
 interface SwitchCrownstoneEvent {
-  type:       "command",
-  subType:    "switchCrownstone"
-  sphere:     SphereData,
-  crownstone: CrownstoneData,
+  type:        "command",
+  subType:     "switchCrownstone"
+  sphere:      SphereData,
+  crownstone:  CrownstoneData,
+}
+
+interface MultiSwitchCrownstoneEvent { // not used yet
+  type:        "command",
+  subType:     "multiSwitch"
+  sphere:      SphereData,
+  switchData:  CrownstoneSwitchData[],
 }
 
 interface PresenceSphereEvent {
@@ -102,9 +114,13 @@ interface SphereData     extends NameIdSet {
 interface UserData       extends NameIdSet {}
 interface LocationData   extends NameIdSet {}
 interface CrownstoneData extends NameIdSet {
-  switchState: number | null,
+  switchState: number, // 0 .. 1
   macAddress: string,
   uid: number,
+}
+
+interface CrownstoneSwitchData extends CrownstoneData {
+  type: "TURN_ON" | "TURN_OFF" | "DIMMING"
 }
 
 interface AbilityData {

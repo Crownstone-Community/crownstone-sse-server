@@ -16,6 +16,7 @@ export class SSEConnection {
   request : Request = null;
   response : Response = null;
   keepAliveTimer = null;
+  count = 0
 
   expirationDate = null;
   uuid = null;
@@ -36,6 +37,9 @@ export class SSEConnection {
     this.keepAliveTimer = setInterval(() => {
       // since we start this message with a colon (:), the client will not see it as a message.
       this.response.write(':ping\n\n');
+
+      let pingEvent = { type:"ping",counter: this.count++ }
+      this._transmit("data:" + JSON.stringify(pingEvent) + "\n\n");
 
       // if we are going to use the compression lib for express, we need to flush after a write.
       this.response.flushHeaders()
@@ -110,7 +114,7 @@ export class SSEConnection {
     this.cleanCallback()
   }
 
-  dispatch(dataStringified: string, eventData: SseEvent) {
+  dispatch(dataStringified: string, eventData: SseDataEvent) {
     if (this._checkIfTokenIsExpired()) {
       return this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
     }

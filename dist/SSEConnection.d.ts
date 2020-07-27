@@ -12,13 +12,14 @@ export declare class SSEConnection {
     request: Request;
     response: Response;
     keepAliveTimer: any;
+    count: number;
     expirationDate: any;
     uuid: any;
     cleanCallback: () => void;
     constructor(accessToken: string, request: Request, response: Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void);
     generateFilterFromScope(): void;
     destroy(message?: string): void;
-    dispatch(dataStringified: string, eventData: SseEvent): void;
+    dispatch(dataStringified: string, eventData: SseDataEvent): void;
     checkScopePermissions(eventData: any): boolean;
     _transmit(data: string): void;
     _checkIfTokenIsExpired(): boolean;

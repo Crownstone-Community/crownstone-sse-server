@@ -20,7 +20,7 @@ class EventDispatcherClass {
    * From here it should be distributed to the enduser.
    * @param eventData
    */
-  dispatch(eventData : SseEvent) {
+  dispatch(eventData : SseDataEvent) {
     let sphereId = eventData?.sphere?.id;
     let clientIdArray = this.routingMap.all[sphereId];
 

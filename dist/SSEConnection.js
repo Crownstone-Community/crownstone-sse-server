@@ -10,6 +10,7 @@ class SSEConnection {
         this.request = null;
         this.response = null;
         this.keepAliveTimer = null;
+        this.count = 0;
         this.expirationDate = null;
         this.uuid = null;
         this.cleanCallback = null;
@@ -24,6 +25,8 @@ class SSEConnection {
         this.keepAliveTimer = setInterval(() => {
             // since we start this message with a colon (:), the client will not see it as a message.
             this.response.write(':ping\n\n');
+            let pingEvent = { type: "ping", counter: this.count++ };
+            this._transmit("data:" + JSON.stringify(pingEvent) + "\n\n");
             // if we are going to use the compression lib for express, we need to flush after a write.
             this.response.flushHeaders();
         }, 30000);
@@ -53,6 +56,8 @@ class SSEConnection {
                 this.scopeFilter["dataChange"] = {};
             }
             this.scopeFilter["dataChange"]["stones"] = () => true;
+            this.scopeFilter["abilityChange"]["all"] = () => true;
+            this.scopeFilter["switchStateUpdate"]["stone"] = () => true;
         }
         if (this.accessModel.scopes.indexOf("sphere_information") !== -1) {
             if (this.scopeFilter["dataChange"] === undefined) {
@@ -74,8 +79,10 @@ class SSEConnection {
             }
             this.scopeFilter["dataChange"]["locations"] = () => true;
         }
+        if (this.accessModel.scopes.indexOf("user_information") !== -1) {
+            this.scopeFilter["dataChange"]["users"] = (eventData) => { return eventData.user.id === this.accessModel.userId; };
+        }
         // if (this.accessModel.scopes.indexOf("power_consumption") !== -1) {}
-        // if (this.accessModel.scopes.indexOf("user_information") !== -1) {}
         // if (this.accessModel.scopes.indexOf("user_id")          !== -1) {}
     }
     destroy(message = "") {
