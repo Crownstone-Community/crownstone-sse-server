@@ -12,7 +12,7 @@ declare class EventDispatcherClass {
      * From here it should be distributed to the enduser.
      * @param eventData
      */
-    dispatch(eventData: SseEvent): void;
+    dispatch(eventData: SseDataEvent): void;
     addClient(accessToken: string, request: Request, response: Response, accessModel: AccessModel): void;
     _clearRoutingMap(): void;
     _refreshLists(): void;

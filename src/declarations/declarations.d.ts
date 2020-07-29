@@ -18,13 +18,14 @@ interface AccessModel {
 
 type SseEvent = SseSystemEvent | SseDataEvent
 type SseSystemEvent = SystemEvent | PingEvent
-type SseDataEvent =       SwitchStateUpdateEvent    |
-                          SwitchCrownstoneEvent     |
-                          SphereTokensUpdatedEvent  |
-                          PresenceSphereEvent       |
-                          PresenceLocationEvent     |
-                          DataChangeEvent           |
-                          AbilityChangeEvent        |
+type SseDataEvent =       SwitchStateUpdateEvent     |
+                          SwitchCrownstoneEvent      |
+                          MultiSwitchCrownstoneEvent |
+                          SphereTokensUpdatedEvent   |
+                          PresenceSphereEvent        |
+                          PresenceLocationEvent      |
+                          DataChangeEvent            |
+                          AbilityChangeEvent         |
                           InvitationChangeEvent
 
 interface PingEvent {

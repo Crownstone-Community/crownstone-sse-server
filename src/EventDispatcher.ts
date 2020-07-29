@@ -1,12 +1,13 @@
 import {Request, Response} from "express-serve-static-core";
 import {Util} from "./util/util";
 import {SSEConnection} from "./SSEConnection";
+import {EventGenerator} from "./EventGenerator";
 
 interface ClientMap {
   [key: string] : SSEConnection
 }
 
-class EventDispatcherClass {
+export class EventDispatcherClass {
 
   clients    : ClientMap  = {};
   routingMap : RoutingMap = null;
@@ -75,6 +76,13 @@ class EventDispatcherClass {
         this.routingMap.all[sphereIdsInClient[j]].push(clientIds[i]);
       }
     }
+  }
+
+  destroy() {
+    Object.keys(this.clients).forEach((clientId) => {
+      this.clients[clientId].destroy(EventGenerator.getErrorEvent(500, "STREAM_CLOSED", "Server stopping. Try again later."));
+    });
+    this._clearRoutingMap();
   }
 }
 

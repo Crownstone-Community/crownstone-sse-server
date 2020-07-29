@@ -67,14 +67,17 @@ export class SSEConnection {
 
     if (this.accessModel.scopes.indexOf("user_location") !== -1) {
       if (this.scopeFilter["presence"] === undefined) { this.scopeFilter["presence"] = {}; }
-      this.scopeFilter["presence"]["all"] = (eventData) => { return eventData.user.id === this.accessModel.userId; };
+      this.scopeFilter["presence"]["*"] = (eventData) => { return eventData.user.id === this.accessModel.userId; };
     }
 
 
     if (this.accessModel.scopes.indexOf("stone_information") !== -1) {
-      if (this.scopeFilter["dataChange"] === undefined) { this.scopeFilter["dataChange"] = {}; }
+      if (this.scopeFilter["dataChange"]        === undefined) { this.scopeFilter["dataChange"] = {}; }
+      if (this.scopeFilter["abilityChange"]     === undefined) { this.scopeFilter["abilityChange"] = {}; }
+      if (this.scopeFilter["switchStateUpdate"] === undefined) { this.scopeFilter["switchStateUpdate"] = {}; }
+
       this.scopeFilter["dataChange"]["stones"]       = () => true;
-      this.scopeFilter["abilityChange"]["all"]       = () => true;
+      this.scopeFilter["abilityChange"]["*"]         = () => true;
       this.scopeFilter["switchStateUpdate"]["stone"] = () => true;
     }
 
@@ -90,6 +93,7 @@ export class SSEConnection {
     if (this.accessModel.scopes.indexOf("switch_stone") !== -1) {
       if (this.scopeFilter["command"] === undefined) { this.scopeFilter["command"] = {}; }
       this.scopeFilter["command"]["switchCrownstone"] = () => true;
+      this.scopeFilter["command"]["multiSwitch"]      = () => true;
     }
 
 
@@ -100,7 +104,8 @@ export class SSEConnection {
 
 
     if (this.accessModel.scopes.indexOf("user_information") !== -1) {
-      this.scopeFilter["dataChange"]["users"] = (eventData) => { return eventData.user.id === this.accessModel.userId; }
+      if (this.scopeFilter["dataChange"] === undefined) { this.scopeFilter["dataChange"] = {}; }
+      this.scopeFilter["dataChange"]["users"] = (eventData) => { return eventData.changedItem.id === this.accessModel.userId; }
     }
 
 
@@ -131,8 +136,8 @@ export class SSEConnection {
 
     let typeFilter = this.scopeFilter[eventData.type];
     if (typeFilter) {
-      if (typeFilter["all"] !== undefined) {
-        return typeFilter["all"](eventData);
+      if (typeFilter["*"] !== undefined) {
+        return typeFilter["*"](eventData);
       }
       else {
         let subType = eventData.subType || eventData.operation;
