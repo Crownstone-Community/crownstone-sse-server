@@ -15,7 +15,7 @@ app.listen(process.env.PORT || port, () => {
 
   let baseUrl = process.env.BASE_URL || ("localhost:"+port);
   if (baseUrl.indexOf("http://") === -1 && baseUrl.indexOf("https://") === -1) {
-    baseUrl = 'https://' + baseUrl
+    baseUrl = 'https://' + baseUrl;
   }
 
   console.log('Web server listening at: %s', baseUrl);
@@ -41,7 +41,6 @@ app.get('/debug', function(req, res) {
 app.get('/sse', function(req, res) {
   let cancelled = false;
   req.once('close', () => { cancelled = true; });
-
   res.writeHead(200, {
     'Connection': 'keep-alive',
     'Content-Type': 'text/event-stream',

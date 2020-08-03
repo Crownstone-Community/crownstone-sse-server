@@ -7,7 +7,7 @@
   "scripts": {
     "start": "tsc --watch",
     "test": "jest",
-    "coverage": "jest --collect-coverage",
+    "coverage": "jest --collect-coverage --collectCoverageFrom=src/**/*",
     "dev": "source start.sh",
     "build": "tsc"
   },

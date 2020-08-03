@@ -8,10 +8,8 @@ interface ScopeFilter {
 }
 
 export class SSEConnection {
-
   accessToken = null;
   accessModel : AccessModel = null;
-  queryFilter = {};
   scopeFilter : ScopeFilter | true = {};
   request : Request = null;
   response : Response = null;

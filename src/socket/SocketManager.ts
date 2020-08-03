@@ -22,9 +22,7 @@ class SocketManagerClass {
   reconnectAfterCloseTimeout = null;
   reconnectCounter = 0;
 
-  constructor() {
-
-  }
+  constructor() {}
 
   setupConnection() {
     console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"])
