@@ -10,7 +10,6 @@ interface ScopeFilter {
   }
 }
 
-
 interface AccessModel {
   accessToken: string,
   ttl: number,

@@ -15,7 +15,7 @@ test("Connect a client", () => {
       "mySphere": true
     },
     scopes: "all"
-  }
+  };
 
   let req = getMockedRequest()
   let res = getMockedResponse()

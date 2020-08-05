@@ -6,7 +6,8 @@ export declare class SocketManagerClass {
     socket: Socket;
     reconnectAfterCloseTimeout: Timeout | undefined;
     reconnectCounter: number;
-    constructor();
+    eventCallback: (arg0: SseDataEvent) => void;
+    constructor(eventCallback: (arg0: SseDataEvent) => void);
     setupConnection(): void;
     isConnected(): boolean;
     _isValidToken(token: string, requestType: string): Promise<AccessModel | false>;

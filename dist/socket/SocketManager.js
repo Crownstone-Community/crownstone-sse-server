@@ -20,8 +20,9 @@ const errors = {
     invalidResponse: 'invalidResponse',
 };
 class SocketManagerClass {
-    constructor() {
+    constructor(eventCallback) {
         this.reconnectCounter = 0;
+        this.eventCallback = eventCallback;
     }
     setupConnection() {
         console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"]);
@@ -38,7 +39,7 @@ class SocketManagerClass {
             let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex');
             callback(output);
             this.socket.removeAllListeners();
-            this.socket.on(protocolTopics.event, (data) => { EventDispatcher_1.EventDispatcher.dispatch(data); });
+            this.socket.on(protocolTopics.event, (data) => { this.eventCallback(data); });
         });
         this.socket.on('disconnect', () => {
             this.reconnectAfterCloseTimeout = setTimeout(() => {
@@ -88,5 +89,5 @@ class SocketManagerClass {
     }
 }
 exports.SocketManagerClass = SocketManagerClass;
-exports.SocketManager = new SocketManagerClass();
+exports.SocketManager = new SocketManagerClass(EventDispatcher_1.EventDispatcher.dispatch);
 //# sourceMappingURL=SocketManager.js.map
