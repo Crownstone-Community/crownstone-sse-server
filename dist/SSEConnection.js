@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SSEConnection = void 0;
 const EventGenerator_1 = require("./EventGenerator");
+const ScopeFilter_1 = require("./ScopeFilter");
 class SSEConnection {
     constructor(accessToken, request, response, accessModel, uuid, cleanCallback) {
         this.scopeFilter = {};
@@ -33,60 +34,7 @@ class SSEConnection {
         });
     }
     generateFilterFromScope() {
-        if (this.accessModel.scopes.indexOf("all") !== -1) {
-            this.scopeFilter = true;
-            return;
-        }
-        this.scopeFilter = {};
-        if (this.accessModel.scopes.indexOf("user_location") !== -1) {
-            if (this.scopeFilter["presence"] === undefined) {
-                this.scopeFilter["presence"] = {};
-            }
-            this.scopeFilter["presence"]["*"] = (eventData) => { return eventData.user.id === this.accessModel.userId; };
-        }
-        if (this.accessModel.scopes.indexOf("stone_information") !== -1) {
-            if (this.scopeFilter["dataChange"] === undefined) {
-                this.scopeFilter["dataChange"] = {};
-            }
-            if (this.scopeFilter["abilityChange"] === undefined) {
-                this.scopeFilter["abilityChange"] = {};
-            }
-            if (this.scopeFilter["switchStateUpdate"] === undefined) {
-                this.scopeFilter["switchStateUpdate"] = {};
-            }
-            this.scopeFilter["dataChange"]["stones"] = () => true;
-            this.scopeFilter["abilityChange"]["*"] = () => true;
-            this.scopeFilter["switchStateUpdate"]["stone"] = () => true;
-        }
-        if (this.accessModel.scopes.indexOf("sphere_information") !== -1) {
-            if (this.scopeFilter["dataChange"] === undefined) {
-                this.scopeFilter["dataChange"] = {};
-            }
-            this.scopeFilter["dataChange"]["stones"] = () => true;
-            this.scopeFilter["dataChange"]["locations"] = () => true;
-            this.scopeFilter["dataChange"]["spheres"] = () => true;
-        }
-        if (this.accessModel.scopes.indexOf("switch_stone") !== -1) {
-            if (this.scopeFilter["command"] === undefined) {
-                this.scopeFilter["command"] = {};
-            }
-            this.scopeFilter["command"]["switchCrownstone"] = () => true;
-            this.scopeFilter["command"]["multiSwitch"] = () => true;
-        }
-        if (this.accessModel.scopes.indexOf("location_information") !== -1) {
-            if (this.scopeFilter["dataChange"] === undefined) {
-                this.scopeFilter["dataChange"] = {};
-            }
-            this.scopeFilter["dataChange"]["locations"] = () => true;
-        }
-        if (this.accessModel.scopes.indexOf("user_information") !== -1) {
-            if (this.scopeFilter["dataChange"] === undefined) {
-                this.scopeFilter["dataChange"] = {};
-            }
-            this.scopeFilter["dataChange"]["users"] = (eventData) => { return eventData.changedItem.id === this.accessModel.userId; };
-        }
-        // if (this.accessModel.scopes.indexOf("power_consumption") !== -1) {}
-        // if (this.accessModel.scopes.indexOf("user_id")          !== -1) {}
+        this.scopeFilter = ScopeFilter_1.generateFilterFromScope(this.accessModel.scopes, this.accessModel.userId);
     }
     destroy(message = "") {
         clearInterval(this.keepAliveTimer);

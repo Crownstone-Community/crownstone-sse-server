@@ -1,8 +1,8 @@
 import io from "socket.io-client"
 import crypto from "crypto"
-import {EventDispatcher} from "../EventDispatcher";
 import Timeout = NodeJS.Timeout;
 import Socket = SocketIOClient.Socket;
+import {EventDispatcher} from "../EventDispatcher";
 
 const RETRY_TIMEOUT = 5000; // ms
 
@@ -25,7 +25,11 @@ export class SocketManagerClass {
   reconnectAfterCloseTimeout : Timeout | undefined;
   reconnectCounter = 0;
 
-  constructor() {}
+  eventCallback : (arg0: SseDataEvent) => void
+
+  constructor(eventCallback: (arg0: SseDataEvent) => void) {
+    this.eventCallback = eventCallback
+  }
 
   setupConnection() {
     console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"])
@@ -45,7 +49,7 @@ export class SocketManagerClass {
       callback(output)
 
       this.socket.removeAllListeners();
-      this.socket.on(protocolTopics.event, (data: SseDataEvent) => { EventDispatcher.dispatch(data); });
+      this.socket.on(protocolTopics.event, (data: SseDataEvent) => { this.eventCallback(data); });
     });
 
     this.socket.on('disconnect', () => {
@@ -102,4 +106,4 @@ export class SocketManagerClass {
 
 }
 
-export const SocketManager = new SocketManagerClass();
+export const SocketManager = new SocketManagerClass(EventDispatcher.dispatch);

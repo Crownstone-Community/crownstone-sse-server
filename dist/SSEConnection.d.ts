@@ -1,11 +1,6 @@
 /// <reference types="node" />
 import { Request, Response } from "express-serve-static-core";
 import Timeout = NodeJS.Timeout;
-interface ScopeFilter {
-    [key: string]: {
-        [key: string]: (arg0: any) => boolean;
-    };
-}
 export declare class SSEConnection {
     accessToken: string;
     accessModel: AccessModel;
@@ -25,4 +20,3 @@ export declare class SSEConnection {
     _transmit(data: string): void;
     _checkIfTokenIsExpired(): boolean;
 }
-export {};

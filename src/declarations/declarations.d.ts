@@ -4,6 +4,12 @@ interface EventFilter {
   sphereIds? : { [key: string]: boolean }
 }
 
+interface ScopeFilter {
+  [key: string]: {
+    [key: string] : (arg0: any) => boolean
+  }
+}
+
 
 interface AccessModel {
   accessToken: string,
