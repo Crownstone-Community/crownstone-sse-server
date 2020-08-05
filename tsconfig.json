@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "es2018",
+    "strict": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "declaration": true,
@@ -11,5 +12,5 @@
   "include": [
     "src/"
   ],
-  "lib": ["es2015"]
+  "lib": ["es2020"]
 }

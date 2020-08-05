@@ -1,5 +1,5 @@
 /// <reference path="./declarations/declarations.d.ts" />
-
+import {Request, Response} from "express-serve-static-core"
 import {EventGenerator} from "./EventGenerator";
 import {EventDispatcher} from "./EventDispatcher";
 import {SocketManager} from "./socket/SocketManager";
@@ -24,7 +24,7 @@ app.listen(process.env.PORT || port, () => {
 app.use("/", express.static('public'))
 app.use(helmet());
 
-app.get('/debug', function(req, res) {
+app.get('/debug', function(req : Request, res : Response) {
   let validationToken = process.env.DEBUG_TOKEN || "debug"
   if (req.query.token === validationToken) {
     let debugInformation = {
@@ -38,7 +38,7 @@ app.get('/debug', function(req, res) {
   }
 })
 
-app.get('/sse', function(req, res) {
+app.get('/sse', function(req : Request, res : Response) {
   let cancelled = false;
   req.once('close', () => { cancelled = true; });
   res.writeHead(200, {

@@ -1,6 +1,8 @@
 import io from "socket.io-client"
 import crypto from "crypto"
 import {EventDispatcher} from "../EventDispatcher";
+import Timeout = NodeJS.Timeout;
+import Socket = SocketIOClient.Socket;
 
 const RETRY_TIMEOUT = 5000; // ms
 
@@ -18,29 +20,32 @@ const errors = {
 }
 
 export class SocketManagerClass {
-  socket = null;
-  reconnectAfterCloseTimeout = null;
+  // @ts-ignore
+  socket : Socket;
+  reconnectAfterCloseTimeout : Timeout | undefined;
   reconnectCounter = 0;
 
   constructor() {}
 
   setupConnection() {
     console.log("Connecting to ", process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"])
-    this.socket = io(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"], { transports: ['websocket'], autoConnect: true});
+    this.socket = io(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"] as string, { transports: ['websocket'], autoConnect: true});
 
     this.socket.on("connect",             () => { console.log("Connected to Crownstone SSE Server host.") })
     this.socket.on("reconnect_attempt",   () => {
       this.reconnectCounter += 1;
-      clearTimeout( this.reconnectAfterCloseTimeout );
+      if (this.reconnectAfterCloseTimeout) {
+        clearTimeout(this.reconnectAfterCloseTimeout);
+      }
     })
 
-    this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
+    this.socket.on(protocolTopics.authenticationRequest, (data: string | number, callback: (arg0: string) => void) => {
       let hasher = crypto.createHash('sha256');
-      let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex');
+      let output = hasher.update(data + (process.env["CROWNSTONE_CLOUD_SSE_TOKEN"] as string)).digest('hex');
       callback(output)
 
-      this.socket.removeAllListeners("event");
-      this.socket.on(protocolTopics.event, (data) => { EventDispatcher.dispatch(data); });
+      this.socket.removeAllListeners();
+      this.socket.on(protocolTopics.event, (data: SseDataEvent) => { EventDispatcher.dispatch(data); });
     });
 
     this.socket.on('disconnect', () => {
@@ -58,7 +63,7 @@ export class SocketManagerClass {
     return this.socket.connected;
   }
 
-  _isValidToken(token, requestType) : Promise<AccessModel | false> {
+  _isValidToken(token: string, requestType: string) : Promise<AccessModel | false> {
     return new Promise((resolve, reject) => {
 
       // in case we can not get the token resolved in time, timeout.
@@ -69,7 +74,7 @@ export class SocketManagerClass {
       }, 3000);
 
       // request the token to be checked, and a accessmodel returned
-      this.socket.emit(requestType, token, (reply) => {
+      this.socket.emit(requestType, token, (reply : any) => {
         clearTimeout(tokenValidityCheckTimeout);
         // if we have already timed out, ignore any response.
         if (responseValid === false) { return; }

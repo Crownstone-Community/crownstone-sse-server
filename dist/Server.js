@@ -1,5 +1,4 @@
 "use strict";
-/// <reference path="./declarations/declarations.d.ts" />
 Object.defineProperty(exports, "__esModule", { value: true });
 const EventGenerator_1 = require("./EventGenerator");
 const EventDispatcher_1 = require("./EventDispatcher");

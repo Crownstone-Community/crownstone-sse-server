@@ -4,16 +4,8 @@ exports.SSEConnection = void 0;
 const EventGenerator_1 = require("./EventGenerator");
 class SSEConnection {
     constructor(accessToken, request, response, accessModel, uuid, cleanCallback) {
-        this.accessToken = null;
-        this.accessModel = null;
         this.scopeFilter = {};
-        this.request = null;
-        this.response = null;
-        this.keepAliveTimer = null;
         this.count = 0;
-        this.expirationDate = null;
-        this.uuid = null;
-        this.cleanCallback = null;
         this.accessToken = accessToken;
         this.accessModel = accessModel;
         this.request = request;
@@ -45,6 +37,7 @@ class SSEConnection {
             this.scopeFilter = true;
             return;
         }
+        this.scopeFilter = {};
         if (this.accessModel.scopes.indexOf("user_location") !== -1) {
             if (this.scopeFilter["presence"] === undefined) {
                 this.scopeFilter["presence"] = {};
@@ -118,7 +111,13 @@ class SSEConnection {
                 return typeFilter["*"](eventData);
             }
             else {
-                let subType = eventData.subType || eventData.operation;
+                let subType = "";
+                if ("subType" in eventData) {
+                    subType = eventData.subType;
+                }
+                else if ("operation" in eventData) {
+                    subType = eventData.operation;
+                }
                 if (typeFilter[subType] !== undefined) {
                     return typeFilter[subType](eventData);
                 }

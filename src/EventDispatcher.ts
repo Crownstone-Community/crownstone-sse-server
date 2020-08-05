@@ -10,7 +10,8 @@ interface ClientMap {
 export class EventDispatcherClass {
 
   clients    : ClientMap  = {};
-  routingMap : RoutingMap = null;
+  // @ts-ignore
+  routingMap : RoutingMap;
 
   constructor() {
     this._clearRoutingMap();

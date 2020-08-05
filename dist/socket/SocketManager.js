@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketManager = void 0;
+exports.SocketManager = exports.SocketManagerClass = void 0;
 const socket_io_client_1 = __importDefault(require("socket.io-client"));
 const crypto_1 = __importDefault(require("crypto"));
 const EventDispatcher_1 = require("../EventDispatcher");
@@ -21,8 +21,6 @@ const errors = {
 };
 class SocketManagerClass {
     constructor() {
-        this.socket = null;
-        this.reconnectAfterCloseTimeout = null;
         this.reconnectCounter = 0;
     }
     setupConnection() {
@@ -31,13 +29,15 @@ class SocketManagerClass {
         this.socket.on("connect", () => { console.log("Connected to Crownstone SSE Server host."); });
         this.socket.on("reconnect_attempt", () => {
             this.reconnectCounter += 1;
-            clearTimeout(this.reconnectAfterCloseTimeout);
+            if (this.reconnectAfterCloseTimeout) {
+                clearTimeout(this.reconnectAfterCloseTimeout);
+            }
         });
         this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
             let hasher = crypto_1.default.createHash('sha256');
             let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex');
             callback(output);
-            this.socket.removeAllListeners("event");
+            this.socket.removeAllListeners();
             this.socket.on(protocolTopics.event, (data) => { EventDispatcher_1.EventDispatcher.dispatch(data); });
         });
         this.socket.on('disconnect', () => {
@@ -87,5 +87,6 @@ class SocketManagerClass {
         return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
     }
 }
+exports.SocketManagerClass = SocketManagerClass;
 exports.SocketManager = new SocketManagerClass();
 //# sourceMappingURL=SocketManager.js.map

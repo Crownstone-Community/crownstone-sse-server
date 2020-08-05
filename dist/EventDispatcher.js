@@ -7,7 +7,6 @@ const EventGenerator_1 = require("./EventGenerator");
 class EventDispatcherClass {
     constructor() {
         this.clients = {};
-        this.routingMap = null;
         this._clearRoutingMap();
     }
     /**

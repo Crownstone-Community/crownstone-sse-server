@@ -11,7 +11,7 @@ interface AccessModel {
   createdAt: number,
   userId: string,
   spheres: {
-    [key: string] : { boolean }
+    [key: string] : boolean
   },
   scopes: string[]
 }
@@ -33,9 +33,10 @@ interface PingEvent {
   counter:  number,
 }
 
+type SystemSubType = "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED"
 interface SystemEvent {
   type:    "system",
-  subType:  "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED",
+  subType:  SystemSubType,
   code:     number,
   message:  string,
 }

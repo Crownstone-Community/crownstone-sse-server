@@ -1,4 +1,4 @@
 export declare const EventGenerator: {
     getStartEvent(): string;
-    getErrorEvent(code: any, subType: any, message: any): string;
+    getErrorEvent(code: number, subType: SystemSubType, message: string): string;
 };

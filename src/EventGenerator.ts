@@ -12,7 +12,7 @@ export const EventGenerator = {
     return "data:" + JSON.stringify(startEvent) + '\n\n';
   },
 
-  getErrorEvent(code, subType, message) : string {
+  getErrorEvent(code : number, subType: SystemSubType, message: string) : string {
     let startEvent: SystemEvent = {
       type:    "system",
       subType:  subType,

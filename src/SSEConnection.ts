@@ -1,25 +1,26 @@
 import {Request, Response} from "express-serve-static-core";
 import {EventGenerator} from "./EventGenerator";
+import Timeout = NodeJS.Timeout;
 
 interface ScopeFilter {
   [key: string]: {
-    [key: string] : (any) => boolean
+    [key: string] : (arg0: any) => boolean
   }
 }
 
 export class SSEConnection {
-  accessToken = null;
-  accessModel : AccessModel = null;
+  accessToken : string;
+  accessModel : AccessModel;
   scopeFilter : ScopeFilter | true = {};
-  request : Request = null;
-  response : Response = null;
-  keepAliveTimer = null;
+  request : Request;
+  response : Response;
+  keepAliveTimer : Timeout;
   count = 0
 
-  expirationDate = null;
-  uuid = null;
+  expirationDate : number
+  uuid : string;
 
-  cleanCallback : () => void = null;
+  cleanCallback : () => void;
 
   constructor(accessToken : string, request: Request, response : Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void) {
     this.accessToken   = accessToken;
@@ -62,6 +63,7 @@ export class SSEConnection {
       return;
     }
 
+    this.scopeFilter = {};
 
     if (this.accessModel.scopes.indexOf("user_location") !== -1) {
       if (this.scopeFilter["presence"] === undefined) { this.scopeFilter["presence"] = {}; }
@@ -127,7 +129,7 @@ export class SSEConnection {
     }
   }
 
-  checkScopePermissions(eventData) : boolean {
+  checkScopePermissions(eventData: SseDataEvent) : boolean {
     if (this.scopeFilter === true) {
       return true;
     }
@@ -138,7 +140,13 @@ export class SSEConnection {
         return typeFilter["*"](eventData);
       }
       else {
-        let subType = eventData.subType || eventData.operation;
+        let subType : string = "";
+        if ("subType" in eventData) {
+          subType = eventData.subType
+        }
+        else if ("operation" in eventData) {
+          subType = eventData.operation
+        }
         if (typeFilter[subType] !== undefined) {
           return typeFilter[subType](eventData);
         }

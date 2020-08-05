@@ -1,25 +1,27 @@
+/// <reference types="node" />
 import { Request, Response } from "express-serve-static-core";
+import Timeout = NodeJS.Timeout;
 interface ScopeFilter {
     [key: string]: {
-        [key: string]: (any: any) => boolean;
+        [key: string]: (arg0: any) => boolean;
     };
 }
 export declare class SSEConnection {
-    accessToken: any;
+    accessToken: string;
     accessModel: AccessModel;
     scopeFilter: ScopeFilter | true;
     request: Request;
     response: Response;
-    keepAliveTimer: any;
+    keepAliveTimer: Timeout;
     count: number;
-    expirationDate: any;
-    uuid: any;
+    expirationDate: number;
+    uuid: string;
     cleanCallback: () => void;
     constructor(accessToken: string, request: Request, response: Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void);
     generateFilterFromScope(): void;
     destroy(message?: string): void;
     dispatch(dataStringified: string, eventData: SseDataEvent): void;
-    checkScopePermissions(eventData: any): boolean;
+    checkScopePermissions(eventData: SseDataEvent): boolean;
     _transmit(data: string): void;
     _checkIfTokenIsExpired(): boolean;
 }
