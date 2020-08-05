@@ -17,7 +17,7 @@ const errors = {
   invalidResponse: 'invalidResponse',
 }
 
-class SocketManagerClass {
+export class SocketManagerClass {
   socket = null;
   reconnectAfterCloseTimeout = null;
   reconnectCounter = 0;
