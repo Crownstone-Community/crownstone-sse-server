@@ -1,5 +1,5 @@
 
-export function generateFilterFromScope(scopes : string[], userId: string): ScopeFilter | true {
+export function generateFilterFromScope(scopes : oauthScope[], userId: string): ScopeFilter | true {
   if (scopes.indexOf("all") !== -1) {
     return true;
   }
@@ -54,4 +54,32 @@ export function generateFilterFromScope(scopes : string[], userId: string): Scop
   // if (scopes.indexOf("user_id")          !== -1) {}
 
   return scopeFilter;
+}
+
+
+export function checkScopePermissions(scopeFilter: ScopeFilter | true, eventData: SseDataEvent) : boolean {
+  if (scopeFilter === true) {
+    return true;
+  }
+
+  let typeFilter = scopeFilter[eventData.type];
+  if (typeFilter) {
+    if (typeFilter["*"] !== undefined) {
+      return typeFilter["*"](eventData);
+    }
+    else {
+      let subType : string = "";
+      if ("subType" in eventData) {
+        subType = eventData.subType
+      }
+      else if ("operation" in eventData) {
+        subType = eventData.operation
+      }
+      if (typeFilter[subType] !== undefined) {
+        return typeFilter[subType](eventData);
+      }
+    }
+  }
+
+  return false;
 }

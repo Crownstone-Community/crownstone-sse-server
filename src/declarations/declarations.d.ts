@@ -4,6 +4,8 @@ interface EventFilter {
   sphereIds? : { [key: string]: boolean }
 }
 
+type oauthScope = "all" | "user_location" | "stone_information" | "sphere_information" | "switch_stone" | "location_information" | "user_information" | "power_consumption" | "user_id";
+
 interface ScopeFilter {
   [key: string]: {
     [key: string] : (arg0: any) => boolean
@@ -18,27 +20,26 @@ interface AccessModel {
   spheres: {
     [key: string] : boolean
   },
-  scopes: string[]
+  scopes: oauthScope[]
 }
 
 type SseEvent = SseSystemEvent | SseDataEvent
 type SseSystemEvent = SystemEvent | PingEvent
-type SseDataEvent =       SwitchStateUpdateEvent     |
-                          SwitchCrownstoneEvent      |
-                          MultiSwitchCrownstoneEvent |
-                          SphereTokensUpdatedEvent   |
-                          PresenceSphereEvent        |
-                          PresenceLocationEvent      |
-                          DataChangeEvent            |
-                          AbilityChangeEvent         |
-                          InvitationChangeEvent
+type SseDataEvent = SwitchStateUpdateEvent     |
+                    MultiSwitchCrownstoneEvent |
+                    SphereTokensUpdatedEvent   |
+                    PresenceSphereEvent        |
+                    PresenceLocationEvent      |
+                    DataChangeEvent            |
+                    AbilityChangeEvent         |
+                    InvitationChangeEvent
 
 interface PingEvent {
   type:    "ping",
   counter:  number,
 }
 
-type SystemSubType = "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED"
+type SystemSubType = "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED" | "COULD_NOT_REFRESH_TOKEN"
 interface SystemEvent {
   type:    "system",
   subType:  SystemSubType,
@@ -46,18 +47,11 @@ interface SystemEvent {
   message:  string,
 }
 
-interface SwitchCrownstoneEvent {
-  type:        "command",
-  subType:     "switchCrownstone"
-  sphere:      SphereData,
-  crownstone:  CrownstoneData,
-}
-
-interface MultiSwitchCrownstoneEvent { // not used yet
+interface MultiSwitchCrownstoneEvent {
   type:        "command",
   subType:     "multiSwitch"
   sphere:      SphereData,
-  switchData:  CrownstoneSwitchData[],
+  switchData:  CrownstoneSwitchCommand[],
 }
 
 interface PresenceSphereEvent {
@@ -108,7 +102,7 @@ interface SwitchStateUpdateEvent {
   type:        'switchStateUpdate',
   subType:     'stone',
   sphere:       SphereData,
-  crownstone:   CrownstoneData,
+  crownstone:   CrownstoneSwitchState,
 }
 
 interface NameIdSet {
@@ -121,14 +115,19 @@ interface SphereData     extends NameIdSet {
 interface UserData       extends NameIdSet {}
 interface LocationData   extends NameIdSet {}
 interface CrownstoneData extends NameIdSet {
-  switchState: number, // 0 .. 1
   macAddress: string,
   uid: number,
 }
-
-interface CrownstoneSwitchData extends CrownstoneData {
-  type: "TURN_ON" | "TURN_OFF" | "DIMMING"
+interface CrownstoneSwitchState extends CrownstoneData {
+  percentage: number, // 0 .. 100
 }
+
+interface CrownstoneSwitchCommand extends CrownstoneData {
+  type: "TURN_ON" | "TURN_OFF" | "PERCENTAGE"
+  percentage?: number, // 0 .. 100
+}
+
+
 
 interface AbilityData {
   type: string,

@@ -16,39 +16,30 @@ export function getSystemEvent(subtype = systemSubTypes[0], code = 10, message =
   }
 }
 
-export function getSwitchCrownstoneEvent(sphereId) {
-  return {
-    type:        "command",
-    subType:     "switchCrownstone",
-    sphere:      getSphereData(sphereId),
-    crownstone:  getCrownstoneData(),
-  }
-}
-
-export function getMultiSwitchCrownstoneEvent(sphereId) {
+export function getMultiSwitchCrownstoneEvent(sphereId) : MultiSwitchCrownstoneEvent {
   return { // not used yet
     type:        "command",
     subType:     "multiSwitch",
     sphere:      getSphereData(sphereId),
-    switchData:  [getCrownstoneData(), getCrownstoneData()],
+    switchData:  [getCrownstoneSwitchCommand(), getCrownstoneSwitchCommand()] as any,
   }
 }
 
 let presenceSubTypes = ["enterSphere", "exitSphere"];
-export function getPresenceSphereEvent(sphereId, userId, subtype = presenceSubTypes[0]) {
+export function getPresenceSphereEvent(sphereId, userId, subtype = presenceSubTypes[0]) : PresenceSphereEvent {
   return {
     type:     "presence",
-    subType:  subtype,
+    subType:  subtype as any,
     user:     getUserData(userId),
     sphere:   getSphereData(sphereId)
   }
 }
 
 let presenceLocationSubTypes = ["enterLocation", "exitLocation"];
-export function getPresenceLocationEvent(sphereId, userId, subtype = presenceLocationSubTypes[0]) {
+export function getPresenceLocationEvent(sphereId, userId, subtype = presenceLocationSubTypes[0]) : PresenceLocationEvent {
   return {
     type:     "presence",
-    subType:  subtype,
+    subType:  subtype as any,
     user:     getUserData(userId),
     sphere:   getSphereData(sphereId),
     location: getLocationData(),
@@ -58,17 +49,17 @@ export function getPresenceLocationEvent(sphereId, userId, subtype = presenceLoc
 
 let dataChangeSubtype = ["users"  , "spheres", "stones", "locations"];
 let dataChangeOperation = ["create" , "delete" , "update"];
-export function getDataChangeEvent(sphereId, userId, subtype = dataChangeSubtype[0], operation = dataChangeOperation[0]) {
+export function getDataChangeEvent(sphereId, userId : string = null, subtype = dataChangeSubtype[0], operation = dataChangeOperation[0]) : DataChangeEvent {
   return {
     type:        "dataChange",
-    subType:     subtype,
-    operation:   operation,
+    subType:     subtype as any,
+    operation:   operation as any,
     sphere:      getSphereData(sphereId),
     changedItem: getNameIdSet(userId),
   }
 }
 
-export function getSphereTokensUpdatedEvent(sphereId) {
+export function getSphereTokensUpdatedEvent(sphereId) : SphereTokensUpdatedEvent {
   return {
     type:        "sphereTokensChanged",
     subType:     "sphereAuthorizationTokens",
@@ -78,10 +69,10 @@ export function getSphereTokensUpdatedEvent(sphereId) {
 }
 
 let abilityChangeSubtypes = ["dimming"  , "switchcraft", "tapToToggle"];
-export function getAbilityChangeEvent(sphereId, subtype = abilityChangeSubtypes[0]) {
+export function getAbilityChangeEvent(sphereId, subtype = abilityChangeSubtypes[0]) : AbilityChangeEvent {
   return {
     type:        "abilityChange",
-    subType:     subtype,
+    subType:     subtype as any,
     sphere:      getSphereData(sphereId),
     stone:       getCrownstoneData(),
     ability:     getAbilityData()
@@ -89,10 +80,10 @@ export function getAbilityChangeEvent(sphereId, subtype = abilityChangeSubtypes[
 }
 
 let invitationOperations = ["invited", "invitationRevoked"]
-export function getInvitationChangeEvent(sphereId, operation = invitationOperations[0]) {
+export function getInvitationChangeEvent(sphereId, operation = invitationOperations[0]) : InvitationChangeEvent {
   return {
     type:        "invitationChange",
-    operation:   operation,
+    operation:   operation as any,
     sphere:      getSphereData(sphereId),
     email:       "unit@test.com",
   }
@@ -102,43 +93,51 @@ export function getSwitchStateUpdateEvent(sphereId) {
     type:        'switchStateUpdate',
     subType:     'stone',
     sphere:       getSphereData(sphereId),
-    crownstone:   getCrownstoneData(),
+    crownstone:   getCrownstoneSwitchState(),
   }
 }
 
-export function getNameIdSet(id = null) {
+export function getNameIdSet(id : string = null) {
   return {
     id:   id || "string",
     name: "string"
   }
 }
-export function getSphereData(sphereId, uid = null) {
+export function getSphereData(sphereId : string, uid : number = null) : SphereData {
   return {
     ...getNameIdSet(sphereId),
     uid: uid || 4
   }
 }
 
-export function getUserData(id) { return getNameIdSet(id) }
-export function getLocationData()  { return getNameIdSet() }
+export function getUserData(id : string) { return getNameIdSet(id) }
+export function getLocationData()        { return getNameIdSet() }
+export function getCrownstoneSwitchState() {
+  return {
+    ...getNameIdSet(),
+    percentage: 40, // 0 .. 100
+    macAddress: "ab:ce:da:ca:e3",
+    uid: 2,
+  }
+}
 export function getCrownstoneData() {
   return {
     ...getNameIdSet(),
-    switchState: 2, // 0 .. 1
     macAddress: "ab:ce:da:ca:e3",
     uid: 2,
   }
 }
 
-let crownstoneSwitchDateTypes = ["TURN_ON", "TURN_OFF", "DIMMING"]
-export function getCrownstoneSwitchData(type) {
+let crownstoneSwitchDateTypes = ["TURN_ON", "TURN_OFF", "PERCENTAGE"]
+export function getCrownstoneSwitchCommand(type : string = "PERCENTAGE") {
   return {
     ...getCrownstoneData(),
+    percentage: type === 'PERCENTAGE' ? 40 : undefined, // 0 .. 100
     type: crownstoneSwitchDateTypes[0] || type
   }
 }
 
-export function getAbilityData() {
+export function getAbilityData() : AbilityData {
   return {
     type: "test",
     enabled: true,
@@ -146,7 +145,7 @@ export function getAbilityData() {
   }
 }
 
-export function getAllDataEvents(sphereId, userId) {
+export function getAllDataEvents(sphereId : string, userId : string) {
   let dataChangeOptions = [];
   dataChangeSubtype.forEach((s) => {
     dataChangeOperation.forEach((o) => {
@@ -156,7 +155,6 @@ export function getAllDataEvents(sphereId, userId) {
 
   return [
     getSwitchStateUpdateEvent(sphereId),
-    getSwitchCrownstoneEvent(sphereId),
     getMultiSwitchCrownstoneEvent(sphereId),
     getSphereTokensUpdatedEvent(sphereId),
     ...presenceSubTypes.map(        (s) => getPresenceSphereEvent(sphereId, userId, s)),

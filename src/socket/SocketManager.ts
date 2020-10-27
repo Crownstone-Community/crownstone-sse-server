@@ -2,7 +2,6 @@ import io from "socket.io-client"
 import crypto from "crypto"
 import Timeout = NodeJS.Timeout;
 import Socket = SocketIOClient.Socket;
-import {EventDispatcher} from "../EventDispatcher";
 
 const RETRY_TIMEOUT = 5000; // ms
 
@@ -19,7 +18,7 @@ const errors = {
   invalidResponse: 'invalidResponse',
 }
 
-export class SocketManagerClass {
+class SocketManagerClass {
   // @ts-ignore
   socket : Socket;
   reconnectAfterCloseTimeout : Timeout | undefined;
@@ -27,8 +26,12 @@ export class SocketManagerClass {
 
   eventCallback : (arg0: SseDataEvent) => void
 
-  constructor(eventCallback: (arg0: SseDataEvent) => void) {
-    this.eventCallback = eventCallback
+  constructor(eventCallback: (arg0: SseDataEvent) => void = () => {}) {
+    this.eventCallback = eventCallback;
+  }
+
+  setCallback(eventCallback: (arg0: SseDataEvent) => void) {
+    this.eventCallback = eventCallback;
   }
 
   setupConnection() {
@@ -96,6 +99,15 @@ export class SocketManagerClass {
     })
   }
 
+  isValidToken(token: string) : Promise<AccessModel | false> {
+    if (token.length > 32) {
+      return this.isValidAccessToken(token);
+    }
+    else {
+      return this.isValidOauthToken(token);
+    }
+  }
+
   isValidAccessToken(token: string) : Promise<AccessModel | false>{
     return this._isValidToken(token, protocolTopics.requestForAccessTokenCheck);
   }
@@ -103,7 +115,6 @@ export class SocketManagerClass {
   isValidOauthToken(token: string) : Promise<AccessModel | false>{
     return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
   }
-
 }
 
-export const SocketManager = new SocketManagerClass(EventDispatcher.dispatch);
+export const SocketManager = new SocketManagerClass();

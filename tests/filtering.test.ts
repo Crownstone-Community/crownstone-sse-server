@@ -1,6 +1,7 @@
 import {EventDispatcherClass} from "../src/EventDispatcher";
 import {getAccessModel, getMockedRequest, getMockedResponse} from "./mocks";
-import {getAllDataEvents} from "./mockEventGenerator";
+import {getAllDataEvents, getDataChangeEvent, getMultiSwitchCrownstoneEvent} from "./mockEventGenerator";
+import {checkScopePermissions, generateFilterFromScope} from "../src/ScopeFilter";
 
 let userId = "userId";
 let sphereId = "sphereId";
@@ -106,7 +107,7 @@ test("test *switch_stone* scopes", () => {
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
-  expect(res.write).toHaveBeenCalledTimes(2);
+  expect(res.write).toHaveBeenCalledTimes(1);
 
   dispatcher.destroy();
 })
@@ -147,4 +148,15 @@ test("test *user_information* scopes", () => {
   expect(res.write).toHaveBeenCalledTimes(3);
 
   dispatcher.destroy();
+})
+
+test("test filtering of scopes", () => {
+  let scopes : oauthScope[] = ["switch_stone"];
+  let userId = "myUserId";
+  let sphereId = "sphereId";
+  let scopeFilter = generateFilterFromScope(scopes, userId);
+  console.log(scopeFilter)
+
+  expect(checkScopePermissions(scopeFilter, getMultiSwitchCrownstoneEvent(sphereId))).toBe(true)
+  expect(checkScopePermissions(scopeFilter, getDataChangeEvent(sphereId))).toBe(false)
 })

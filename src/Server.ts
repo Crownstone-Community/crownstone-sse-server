@@ -9,6 +9,7 @@ const express = require('express');
 const app = express();
 const port = 8000;
 
+SocketManager.setCallback(EventDispatcher.dispatch)
 SocketManager.setupConnection();
 
 app.listen(process.env.PORT || port, () => {
@@ -57,15 +58,7 @@ app.get('/sse', function(req : Request, res : Response) {
     res.end(EventGenerator.getErrorEvent(500, "NO_CONNECTION", "Not connected to cloud service. Try again later..."))
   }
 
-  let validationPromise;
-  if (accessToken.length > 32) {
-    validationPromise = SocketManager.isValidAccessToken(accessToken);
-  }
-  else {
-    validationPromise = SocketManager.isValidOauthToken(accessToken);
-  }
-
-  validationPromise
+  SocketManager.isValidToken(accessToken)
     .then((validationResult) => {
       // if the connection is cancelled before it is validated, do not start the connection
       if (cancelled) { return res.end(); }

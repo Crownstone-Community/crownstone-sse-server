@@ -3,10 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketManager = exports.SocketManagerClass = void 0;
+exports.SocketManager = void 0;
 const socket_io_client_1 = __importDefault(require("socket.io-client"));
 const crypto_1 = __importDefault(require("crypto"));
-const EventDispatcher_1 = require("../EventDispatcher");
 const RETRY_TIMEOUT = 5000; // ms
 const protocolTopics = {
     requestForOauthTokenCheck: "requestForOauthTokenCheck",
@@ -20,8 +19,11 @@ const errors = {
     invalidResponse: 'invalidResponse',
 };
 class SocketManagerClass {
-    constructor(eventCallback) {
+    constructor(eventCallback = () => { }) {
         this.reconnectCounter = 0;
+        this.eventCallback = eventCallback;
+    }
+    setCallback(eventCallback) {
         this.eventCallback = eventCallback;
     }
     setupConnection() {
@@ -81,6 +83,14 @@ class SocketManagerClass {
             });
         });
     }
+    isValidToken(token) {
+        if (token.length > 32) {
+            return this.isValidAccessToken(token);
+        }
+        else {
+            return this.isValidOauthToken(token);
+        }
+    }
     isValidAccessToken(token) {
         return this._isValidToken(token, protocolTopics.requestForAccessTokenCheck);
     }
@@ -88,6 +98,5 @@ class SocketManagerClass {
         return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
     }
 }
-exports.SocketManagerClass = SocketManagerClass;
-exports.SocketManager = new SocketManagerClass(EventDispatcher_1.EventDispatcher.dispatch);
+exports.SocketManager = new SocketManagerClass();
 //# sourceMappingURL=SocketManager.js.map

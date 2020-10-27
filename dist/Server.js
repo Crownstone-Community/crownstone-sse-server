@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const express = require('express');
 const app = express();
 const port = 8000;
+SocketManager_1.SocketManager.setCallback(EventDispatcher_1.EventDispatcher.dispatch);
 SocketManager_1.SocketManager.setupConnection();
 app.listen(process.env.PORT || port, () => {
     let baseUrl = process.env.BASE_URL || ("localhost:" + port);
@@ -46,14 +47,7 @@ app.get('/sse', function (req, res) {
     if (SocketManager_1.SocketManager.isConnected() === false) {
         res.end(EventGenerator_1.EventGenerator.getErrorEvent(500, "NO_CONNECTION", "Not connected to cloud service. Try again later..."));
     }
-    let validationPromise;
-    if (accessToken.length > 32) {
-        validationPromise = SocketManager_1.SocketManager.isValidAccessToken(accessToken);
-    }
-    else {
-        validationPromise = SocketManager_1.SocketManager.isValidOauthToken(accessToken);
-    }
-    validationPromise
+    SocketManager_1.SocketManager.isValidToken(accessToken)
         .then((validationResult) => {
         // if the connection is cancelled before it is validated, do not start the connection
         if (cancelled) {

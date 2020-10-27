@@ -15,7 +15,7 @@ export const getMockedResponse = function(input = {}) {
 }
 
 
-export const getAccessModel = function(sphereId: string, userId, scopes: string[]) : AccessModel {
+export const getAccessModel = function(sphereId: string, userId, scopes: oauthScope[]) : AccessModel {
   let spheres = {}
   spheres[sphereId] = true;
   return {
