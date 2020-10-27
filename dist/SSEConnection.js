@@ -45,33 +45,9 @@ class SSEConnection {
         if (this._checkIfTokenIsExpired()) {
             return this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
         }
-        if (this.checkScopePermissions(eventData)) {
+        if (ScopeFilter_1.checkScopePermissions(this.scopeFilter, eventData)) {
             this._transmit("data:" + dataStringified + "\n\n");
         }
-    }
-    checkScopePermissions(eventData) {
-        if (this.scopeFilter === true) {
-            return true;
-        }
-        let typeFilter = this.scopeFilter[eventData.type];
-        if (typeFilter) {
-            if (typeFilter["*"] !== undefined) {
-                return typeFilter["*"](eventData);
-            }
-            else {
-                let subType = "";
-                if ("subType" in eventData) {
-                    subType = eventData.subType;
-                }
-                else if ("operation" in eventData) {
-                    subType = eventData.operation;
-                }
-                if (typeFilter[subType] !== undefined) {
-                    return typeFilter[subType](eventData);
-                }
-            }
-        }
-        return false;
     }
     _transmit(data) {
         this.response.write(data);

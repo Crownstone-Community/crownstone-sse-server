@@ -16,7 +16,6 @@ export declare class SSEConnection {
     generateFilterFromScope(): void;
     destroy(message?: string): void;
     dispatch(dataStringified: string, eventData: SseDataEvent): void;
-    checkScopePermissions(eventData: SseDataEvent): boolean;
     _transmit(data: string): void;
     _checkIfTokenIsExpired(): boolean;
 }

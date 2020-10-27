@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateFilterFromScope = void 0;
+exports.checkScopePermissions = exports.generateFilterFromScope = void 0;
 function generateFilterFromScope(scopes, userId) {
     if (scopes.indexOf("all") !== -1) {
         return true;
@@ -58,4 +58,29 @@ function generateFilterFromScope(scopes, userId) {
     return scopeFilter;
 }
 exports.generateFilterFromScope = generateFilterFromScope;
+function checkScopePermissions(scopeFilter, eventData) {
+    if (scopeFilter === true) {
+        return true;
+    }
+    let typeFilter = scopeFilter[eventData.type];
+    if (typeFilter) {
+        if (typeFilter["*"] !== undefined) {
+            return typeFilter["*"](eventData);
+        }
+        else {
+            let subType = "";
+            if ("subType" in eventData) {
+                subType = eventData.subType;
+            }
+            else if ("operation" in eventData) {
+                subType = eventData.operation;
+            }
+            if (typeFilter[subType] !== undefined) {
+                return typeFilter[subType](eventData);
+            }
+        }
+    }
+    return false;
+}
+exports.checkScopePermissions = checkScopePermissions;
 //# sourceMappingURL=ScopeFilter.js.map
