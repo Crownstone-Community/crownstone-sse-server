@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const express = require('express');
 const app = express();
 const port = 8000;
-SocketManager_1.SocketManager.setCallback(EventDispatcher_1.EventDispatcher.dispatch);
+SocketManager_1.SocketManager.setCallback(EventDispatcher_1.EventDispatcher.dispatch.bind(EventDispatcher_1.EventDispatcher));
 SocketManager_1.SocketManager.setupConnection();
 app.listen(process.env.PORT || port, () => {
     let baseUrl = process.env.BASE_URL || ("localhost:" + port);

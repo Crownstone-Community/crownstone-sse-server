@@ -9,7 +9,7 @@ const express = require('express');
 const app = express();
 const port = 8000;
 
-SocketManager.setCallback(EventDispatcher.dispatch)
+SocketManager.setCallback(EventDispatcher.dispatch.bind(EventDispatcher))
 SocketManager.setupConnection();
 
 app.listen(process.env.PORT || port, () => {
