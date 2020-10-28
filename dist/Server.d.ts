@@ -1,2 +1,3 @@
 /// <reference path="../src/declarations/declarations.d.ts" />
-export {};
+import { Request } from "express-serve-static-core";
+export declare function extractToken(request: Request): string | null;

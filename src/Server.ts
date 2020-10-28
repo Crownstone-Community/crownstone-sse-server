@@ -49,9 +49,9 @@ app.get('/sse', function(req : Request, res : Response) {
     'X-Accel-Buffering': 'no'
   });
 
-  const accessToken = req.query.accessToken;
+  const accessToken = extractToken(req);
   if (!accessToken) {
-    res.end( EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
+    res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
     return;
   }
 
@@ -80,3 +80,13 @@ app.get('/sse', function(req : Request, res : Response) {
     })
 })
 
+export function extractToken(request:Request) : string | null {
+  let access_token : string | null = String(
+    request.header('access_token') ||
+    request.header('Authorization') ||
+    request.query.access_token ||
+    request.query.accessToken
+  ) || null;
+
+  return access_token
+}

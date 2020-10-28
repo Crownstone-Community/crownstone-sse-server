@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.extractToken = void 0;
 const EventGenerator_1 = require("./EventGenerator");
 const EventDispatcher_1 = require("./EventDispatcher");
 const SocketManager_1 = require("./socket/SocketManager");
@@ -40,7 +41,7 @@ app.get('/sse', function (req, res) {
         'Cache-Control': 'no-cache',
         'X-Accel-Buffering': 'no'
     });
-    const accessToken = req.query.accessToken;
+    const accessToken = extractToken(req);
     if (!accessToken) {
         res.end(EventGenerator_1.EventGenerator.getErrorEvent(400, "NO_ACCESS_TOKEN", "No accessToken provided..."));
         return;
@@ -69,4 +70,12 @@ app.get('/sse', function (req, res) {
         res.end(err);
     });
 });
+function extractToken(request) {
+    let access_token = String(request.header('access_token') ||
+        request.header('Authorization') ||
+        request.query.access_token ||
+        request.query.accessToken) || null;
+    return access_token;
+}
+exports.extractToken = extractToken;
 //# sourceMappingURL=Server.js.map
