@@ -31,20 +31,29 @@ class SocketManagerClass {
         this.socket = socket_io_client_1.default(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"], { transports: ['websocket'], autoConnect: true });
         this.socket.on("connect", () => { console.log("Connected to Crownstone SSE Server host."); });
         this.socket.on("reconnect_attempt", () => {
+            console.log("Attempting to reconnect...");
             this.reconnectCounter += 1;
             if (this.reconnectAfterCloseTimeout) {
                 clearTimeout(this.reconnectAfterCloseTimeout);
+                this.reconnectAfterCloseTimeout = undefined;
             }
         });
         this.socket.on(protocolTopics.authenticationRequest, (data, callback) => {
             let hasher = crypto_1.default.createHash('sha256');
             let output = hasher.update(data + process.env["CROWNSTONE_CLOUD_SSE_TOKEN"]).digest('hex');
             callback(output);
-            this.socket.removeAllListeners();
+            console.log("Authentication challenge completed.");
+            this.socket.removeListener(protocolTopics.event);
             this.socket.on(protocolTopics.event, (data) => { this.eventCallback(data); });
         });
         this.socket.on('disconnect', () => {
+            console.warn("disconnected...");
+            if (this.reconnectAfterCloseTimeout) {
+                clearTimeout(this.reconnectAfterCloseTimeout);
+                this.reconnectAfterCloseTimeout = undefined;
+            }
             this.reconnectAfterCloseTimeout = setTimeout(() => {
+                console.log("Triggering reconnect...");
                 this.socket.removeAllListeners();
                 // on disconnect, all events are destroyed so we can just re-initialize.
                 // under normal circumstances, the reconnect would take over and it will clear this timeout.
@@ -62,8 +71,9 @@ class SocketManagerClass {
             let responseValid = true;
             let tokenValidityCheckTimeout = setTimeout(() => {
                 responseValid = false;
+                this.socket.close();
                 reject(errors.couldNotVerifyToken);
-            }, 3000);
+            }, 10000);
             // request the token to be checked, and a accessmodel returned
             this.socket.emit(requestType, token, (reply) => {
                 clearTimeout(tokenValidityCheckTimeout);

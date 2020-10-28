@@ -52,10 +52,13 @@ app.get('/sse', function(req : Request, res : Response) {
   const accessToken = req.query.accessToken;
   if (!accessToken) {
     res.end( EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
+    return;
   }
 
   if (SocketManager.isConnected() === false) {
+    console.warn("Attempted to connect to the SSE while it wasnt connected to the cloud.");
     res.end(EventGenerator.getErrorEvent(500, "NO_CONNECTION", "Not connected to cloud service. Try again later..."))
+    return;
   }
 
   SocketManager.isValidToken(accessToken)
@@ -72,7 +75,7 @@ app.get('/sse', function(req : Request, res : Response) {
       }
     })
     .catch((err) => {
-      console.log("err", err)
+      console.log("Error in SocketManager.isValidToken", err)
       res.end(err);
     })
 })
