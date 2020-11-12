@@ -42,9 +42,17 @@ export class EventDispatcherClass {
       response,
       accessModel,
       uuid,
-      () => { delete this.clients[uuid]; this._refreshLists(); }
+      () => {
+        delete this.clients[uuid];
+        this._refreshLists();
+      }
     );
-    this._refreshLists();
+    if (this.clients[uuid].connected) {
+      this._refreshLists();
+    }
+    else {
+      delete this.clients[uuid];
+    }
   }
 
   _clearRoutingMap() {

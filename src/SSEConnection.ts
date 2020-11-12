@@ -11,6 +11,7 @@ export class SSEConnection {
   response : Response;
   keepAliveTimer : Timeout;
   count = 0
+  connected = false;
 
   expirationDate : number
   uuid : string;
@@ -29,8 +30,8 @@ export class SSEConnection {
 
     // A HTTP connection times out after 2 minutes. To avoid this, we send keep alive messages every 30 seconds
     this.keepAliveTimer = setInterval(() => {
-      // since we start this message with a colon (:), the client will not see it as a message.
-      this.response.write(':ping\n\n');
+      // this is not used anymore since we need the ping in node environment which does not show these messages.
+      // this.response.write(':ping\n\n');
 
       let pingEvent = { type:"ping",counter: this.count++ }
       this._transmit("data:" + JSON.stringify(pingEvent) + "\n\n");
@@ -50,6 +51,8 @@ export class SSEConnection {
     this.request.once('close', () => {
       this.destroy(EventGenerator.getErrorEvent(408, "STREAM_CLOSED", "Event stream has been closed."));
     });
+
+    this.connected = true;
   }
 
   generateFilterFromScope() {
@@ -57,9 +60,10 @@ export class SSEConnection {
   }
 
   destroy(message = "") {
+    this.connected = false;
     clearInterval(this.keepAliveTimer);
     this.response.end(message);
-    this.cleanCallback()
+    this.cleanCallback();
   }
 
   dispatch(dataStringified: string, eventData: SseDataEvent) {

@@ -5,11 +5,11 @@
   "main": "./dist/server.js",
   "types": "./dist/server.d.ts ",
   "scripts": {
-    "start": "tsc --watch",
+    "start": "source start.sh",
     "test": "jest",
     "coverage": "jest --collect-coverage --collectCoverageFrom=src/**/*",
-    "dev": "source start.sh",
-    "build": "tsc"
+    "dev": "tsc --watch",
+    "build": "rimraf ./dist && tsc"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +27,8 @@
     "jest": "^26.1.0",
     "supervisor": "^0.12.0",
     "ts-jest": "^26.1.4",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "rimraf": "^3.0.2"
   },
   "engines": {
     "node": "^12.14.1"

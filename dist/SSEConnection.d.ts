@@ -9,6 +9,7 @@ export declare class SSEConnection {
     response: Response;
     keepAliveTimer: Timeout;
     count: number;
+    connected: boolean;
     expirationDate: number;
     uuid: string;
     cleanCallback: () => void;
