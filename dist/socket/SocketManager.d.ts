@@ -1,5 +1,5 @@
-/// <reference types="node" />
 /// <reference types="socket.io-client" />
+/// <reference types="node" />
 import Timeout = NodeJS.Timeout;
 import Socket = SocketIOClient.Socket;
 declare class SocketManagerClass {
