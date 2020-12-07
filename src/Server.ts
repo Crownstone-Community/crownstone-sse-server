@@ -2,15 +2,24 @@
 import {Request, Response} from "express-serve-static-core"
 import {EventGenerator} from "./EventGenerator";
 import {EventDispatcher} from "./EventDispatcher";
-import {SocketManager} from "./socket/SocketManager";
+import {SocketManager, SocketManager_next} from "./socket/SocketManagers";
+import {SocketManagerClass} from "./socket/SocketManagerClass";
 const helmet = require('helmet')
 
 const express = require('express');
 const app = express();
 const port = 8000;
 
-SocketManager.setCallback(EventDispatcher.dispatch.bind(EventDispatcher))
-SocketManager.setupConnection();
+
+if (process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"]) {
+  SocketManager.setCallback(EventDispatcher.dispatch.bind(EventDispatcher))
+  // SocketManager.setupConnection(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"] as string);
+}
+
+if (process.env["CROWNSTONE_CLOUD_NEXT_SOCKET_ENDPOINT"]) {
+  SocketManager_next.setCallback(EventDispatcher.dispatch.bind(EventDispatcher))
+  SocketManager_next.setupConnection(process.env["CROWNSTONE_CLOUD_NEXT_SOCKET_ENDPOINT"] as string);
+}
 
 app.listen(process.env.PORT || port, () => {
 
@@ -30,6 +39,7 @@ app.get('/debug', function(req : Request, res : Response) {
   if (req.query.token === validationToken) {
     let debugInformation = {
       connected: SocketManager.isConnected(),
+      connectedNext: SocketManager_next.isConnected(),
       amountOfConnections: Object.keys(EventDispatcher.clients).length
     };
     res.end(JSON.stringify(debugInformation))
@@ -40,7 +50,21 @@ app.get('/debug', function(req : Request, res : Response) {
 })
 
 app.get('/sse', function(req : Request, res : Response) {
+  const accessToken = extractToken(req);
+  if (!accessToken) {
+    console.warn("Request received without access token!");
+    res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
+    return;
+  }
+
+  connectWithCloud(SocketManager,      req, res, accessToken);
+  connectWithCloud(SocketManager_next, req, res, accessToken);
+})
+
+
+function connectWithCloud(socketManager: SocketManagerClass, req : Request, res : Response, accessToken: string) {
   let cancelled = false;
+
   req.once('close', () => { cancelled = true; });
   res.writeHead(200, {
     'Connection': 'keep-alive',
@@ -49,12 +73,6 @@ app.get('/sse', function(req : Request, res : Response) {
     'X-Accel-Buffering': 'no'
   });
 
-  const accessToken = extractToken(req);
-  if (!accessToken) {
-    console.warn("Request received without access token!");
-    res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
-    return;
-  }
 
   if (SocketManager.isConnected() === false) {
     console.warn("Attempted to connect to the SSE while it wasnt connected to the cloud.");
@@ -83,7 +101,7 @@ app.get('/sse', function(req : Request, res : Response) {
       console.log("Error in SocketManager.isValidToken", err)
       res.end(err);
     })
-})
+}
 
 export function extractToken(request:Request) : string | null {
   let access_token : string | null = String(
