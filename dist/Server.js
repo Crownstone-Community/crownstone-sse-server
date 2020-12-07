@@ -43,6 +43,7 @@ app.get('/sse', function (req, res) {
     });
     const accessToken = extractToken(req);
     if (!accessToken) {
+        console.warn("Request received without access token!");
         res.end(EventGenerator_1.EventGenerator.getErrorEvent(400, "NO_ACCESS_TOKEN", "No accessToken provided..."));
         return;
     }
@@ -55,9 +56,11 @@ app.get('/sse', function (req, res) {
         .then((validationResult) => {
         // if the connection is cancelled before it is validated, do not start the connection
         if (cancelled) {
+            console.warn("Cancelled request after validation.");
             return res.end();
         }
         if (validationResult === false) {
+            console.warn("Request received without VALID access token!");
             return res.end(EventGenerator_1.EventGenerator.getErrorEvent(400, "NO_ACCESS_TOKEN", "No valid accessToken provided..."));
         }
         else {

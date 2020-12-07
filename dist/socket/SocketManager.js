@@ -71,6 +71,7 @@ class SocketManagerClass {
             let responseValid = true;
             let tokenValidityCheckTimeout = setTimeout(() => {
                 responseValid = false;
+                console.warn("Timeout validating accessToken.");
                 this.socket.close();
                 reject(errors.couldNotVerifyToken);
             }, 10000);
@@ -82,9 +83,11 @@ class SocketManagerClass {
                     return;
                 }
                 if ((reply === null || reply === void 0 ? void 0 : reply.code) !== 200) {
+                    console.warn("Invalid token received in request.");
                     reject(errors.invalidToken);
                 }
                 else if (reply === null || reply === void 0 ? void 0 : reply.data) {
+                    console.log("Token validation finished.");
                     resolve(reply === null || reply === void 0 ? void 0 : reply.data);
                 }
                 else {

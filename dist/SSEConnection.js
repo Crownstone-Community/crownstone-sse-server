@@ -25,6 +25,7 @@ class SSEConnection {
             this.response.flushHeaders();
         }, 30000);
         if (this._checkIfTokenIsExpired()) {
+            console.info("Token has expired at", new Date(this.expirationDate).toISOString());
             this.destroy(EventGenerator_1.EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
             return;
         }
