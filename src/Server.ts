@@ -57,14 +57,8 @@ app.get('/sse', function(req : Request, res : Response) {
     return;
   }
 
-  connectWithCloud(SocketManager,      req, res, accessToken);
-  connectWithCloud(SocketManager_next, req, res, accessToken);
-})
-
-
-function connectWithCloud(socketManager: SocketManagerClass, req : Request, res : Response, accessToken: string) {
+  // we only need to connect this incoming request to the legacy cloud. It will handle all the bookkeeping and the token validation.
   let cancelled = false;
-
   req.once('close', () => { cancelled = true; });
   res.writeHead(200, {
     'Connection': 'keep-alive',
@@ -101,7 +95,9 @@ function connectWithCloud(socketManager: SocketManagerClass, req : Request, res 
       console.log("Error in SocketManager.isValidToken", err)
       res.end(err);
     })
-}
+})
+
+
 
 export function extractToken(request:Request) : string | null {
   let access_token : string | null = String(
