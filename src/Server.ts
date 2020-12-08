@@ -13,7 +13,7 @@ const port = 8000;
 
 if (process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"]) {
   SocketManager.setCallback(EventDispatcher.dispatch.bind(EventDispatcher))
-  // SocketManager.setupConnection(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"] as string);
+  SocketManager.setupConnection(process.env["CROWNSTONE_CLOUD_SOCKET_ENDPOINT"] as string);
 }
 
 if (process.env["CROWNSTONE_CLOUD_NEXT_SOCKET_ENDPOINT"]) {
