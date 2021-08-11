@@ -3,7 +3,6 @@ import {Request, Response} from "express-serve-static-core"
 import {EventGenerator} from "./EventGenerator";
 import {EventDispatcher} from "./EventDispatcher";
 import {SocketManager, SocketManager_next} from "./socket/SocketManagers";
-import {SocketManagerClass} from "./socket/SocketManagerClass";
 const helmet = require('helmet')
 
 const express = require('express');
