@@ -63,8 +63,8 @@ export class SSEConnection {
   destroy(message = "") {
     this.connected = false;
     clearInterval(this.keepAliveTimer);
-    this.response.end(message);
     this.cleanCallback();
+    this.response.end(message);
   }
 
   dispatch(dataStringified: string, eventData: SseDataEvent) {

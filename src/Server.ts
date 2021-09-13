@@ -48,7 +48,8 @@ app.get('/debug', function(req : Request, res : Response) {
   }
 })
 
-app.get('/sse', function(req : Request, res : Response) {
+
+app.get('/sse', async function(req : Request, res : Response) {
   const accessToken = extractToken(req);
   if (!accessToken) {
     console.warn("Request received without access token!");
@@ -73,27 +74,31 @@ app.get('/sse', function(req : Request, res : Response) {
     return;
   }
 
-  SocketManager.isValidToken(accessToken)
-    .then((validationResult) => {
-      // if the connection is cancelled before it is validated, do not start the connection
-      if (cancelled) {
-        console.warn("Cancelled request after validation.");
-        return res.end();
-      }
+  let validationResult;
+  try {
+    validationResult = await SocketManager.isValidToken(accessToken)
+  }
+  catch (err) {
+    console.log("Error in SocketManager.isValidToken", err)
+    return res.end(err);
+  }
 
-      if (validationResult === false) {
-        console.warn("Request received without VALID access token!");
-        return res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No valid accessToken provided..."));
-      }
-      else {
-        res.write(EventGenerator.getStartEvent());
-        EventDispatcher.addClient(accessToken, req, res, validationResult);
-      }
-    })
-    .catch((err) => {
-      console.log("Error in SocketManager.isValidToken", err)
-      res.end(err);
-    })
+  // if the connection is cancelled before it is validated, do not start the connection
+  if (cancelled) {
+    console.warn("Cancelled request after validation.");
+    return res.end();
+  }
+
+  if (validationResult === false) {
+    console.warn("Request received without VALID access token!");
+    return res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No valid accessToken provided..."));
+  }
+  else {
+    res.write(EventGenerator.getStartEvent());
+
+    // @ts-ignore
+    EventDispatcher.addClient(accessToken, req, res, validationResult);
+  }
 })
 
 
