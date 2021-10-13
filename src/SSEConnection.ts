@@ -61,9 +61,11 @@ export class SSEConnection {
   }
 
   destroy(message = "") {
+    console.log("Destroy message", message);
     this.connected = false;
     clearInterval(this.keepAliveTimer);
     this.cleanCallback();
+
     this.response.end(message);
   }
 
