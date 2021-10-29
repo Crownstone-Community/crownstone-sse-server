@@ -13,6 +13,7 @@ export class SSEConnection {
   count = 0
   connected = false;
 
+  _destroyed = false;
   expirationDate : number
   uuid : string;
 
@@ -41,7 +42,7 @@ export class SSEConnection {
     }, 30000);
 
     if (this._checkIfTokenIsExpired()) {
-      console.info("Token has expired at", new Date(this.expirationDate).toISOString());
+      console.info(this.uuid, "Token has expired at", new Date(this.expirationDate).toISOString());
       this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
       return;
     }
@@ -61,12 +62,20 @@ export class SSEConnection {
   }
 
   destroy(message = "") {
-    console.log("Destroy message", message);
-    this.connected = false;
-    clearInterval(this.keepAliveTimer);
-    this.cleanCallback();
+    if (this._destroyed == false) {
+      this._destroyed = true;
+      console.log(this.uuid, "Destroy message", message);
+      this.connected = false;
+      clearInterval(this.keepAliveTimer);
+      this.request.removeAllListeners();
+      this.cleanCallback();
 
-    this.response.end(message);
+      try {
+        this.response.end(message);
+      } catch (err) {
+        console.error("Tried to send a message after ending.")
+      }
+    }
   }
 
   dispatch(dataStringified: string, eventData: SseDataEvent) {
