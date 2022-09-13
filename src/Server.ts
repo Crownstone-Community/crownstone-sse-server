@@ -51,8 +51,9 @@ app.get('/debug', function(req : Request, res : Response) {
 
 app.get('/sse', async function(req : Request, res : Response) {
   const accessToken = extractToken(req);
+  const projectName = getProjectName(req);
   if (!accessToken) {
-    console.warn("Request received without access token!");
+    console.warn("Request received without access token! Source:", projectName);
     res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No accessToken provided...") );
     return;
   }
@@ -69,7 +70,7 @@ app.get('/sse', async function(req : Request, res : Response) {
 
 
   if (SocketManager.isConnected() === false) {
-    console.warn("Attempted to connect to the SSE while it wasnt connected to the cloud.");
+    console.warn("Attempted to connect to the SSE while it wasnt connected to the cloud. Source:", projectName);
     res.end(EventGenerator.getErrorEvent(500, "NO_CONNECTION", "Not connected to cloud service. Try again later..."))
     return;
   }
@@ -79,25 +80,25 @@ app.get('/sse', async function(req : Request, res : Response) {
     validationResult = await SocketManager.isValidToken(accessToken)
   }
   catch (err) {
-    console.log("Error in SocketManager.isValidToken", err)
-    return res.end(err);
+    console.log("Error in SocketManager.isValidToken Source:", projectName, err)
+    return res.end(EventGenerator.getErrorEvent(401,"INVALID_ACCESS_TOKEN", "No valid accessToken provided..."));
   }
 
   // if the connection is cancelled before it is validated, do not start the connection
   if (cancelled) {
-    console.warn("Cancelled request after validation.");
+    console.warn("Cancelled request after validation. Source:", projectName);
     return res.end();
   }
 
   if (validationResult === false) {
-    console.warn("Request received without VALID access token!");
-    return res.end(EventGenerator.getErrorEvent(400,"NO_ACCESS_TOKEN", "No valid accessToken provided..."));
+    console.warn("Request received without VALID access token! Source:", projectName);
+    return res.end(EventGenerator.getErrorEvent(401,"INVALID_ACCESS_TOKEN", "No valid accessToken provided..."));
   }
   else {
     res.write(EventGenerator.getStartEvent());
 
     // @ts-ignore
-    EventDispatcher.addClient(accessToken, req, res, validationResult);
+    EventDispatcher.addClient(accessToken, projectName, req, res, validationResult);
   }
 })
 
@@ -112,4 +113,16 @@ export function extractToken(request:Request) : string | null {
   ) || null;
 
   return access_token
+}
+
+
+export function getProjectName(request:Request) : string | null {
+  let projectName : string = String(
+    request.header('project_name') ||
+    request.header('projectName') ||
+    request.query.project_name ||
+    request.query.projectName
+  ) || 'unknown_project';
+
+  return projectName
 }

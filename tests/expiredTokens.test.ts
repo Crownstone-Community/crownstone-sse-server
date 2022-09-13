@@ -21,7 +21,7 @@ test("Connect a client with an expired token", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req,res, accessModel);
+  dispatcher.addClient("myAccessToken",'unittest', req,res, accessModel);
   expect(Object.keys(dispatcher.clients).length).toBe(0)
 
 })

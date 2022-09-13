@@ -39,7 +39,7 @@ interface PingEvent {
   counter:  number,
 }
 
-type SystemSubType = "TOKEN_EXPIRED" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED" | "COULD_NOT_REFRESH_TOKEN"
+type SystemSubType = "TOKEN_EXPIRED" | "INVALID_ACCESS_TOKEN" | "NO_ACCESS_TOKEN" | "NO_CONNECTION" | "STREAM_START" | "STREAM_CLOSED" | "COULD_NOT_REFRESH_TOKEN"
 interface SystemEvent {
   type:    "system",
   subType:  SystemSubType,

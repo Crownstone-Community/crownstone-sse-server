@@ -1,6 +1,7 @@
 export const getMockedRequest = function(input = {}) {
   return {
     once: jest.fn(),
+    removeAllListeners: jest.fn(),
     ...input
   }
 }

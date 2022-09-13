@@ -34,7 +34,7 @@ export class EventDispatcherClass {
     }
   }
 
-  addClient(accessToken: string, request : Request, response: Response, accessModel: AccessModel) {
+  addClient(accessToken: string, projectName: string, request : Request, response: Response, accessModel: AccessModel) {
     let uuid = Util.getUUID();
     this.clients[uuid] = new SSEConnection(
       accessToken,
@@ -42,6 +42,7 @@ export class EventDispatcherClass {
       response,
       accessModel,
       uuid,
+      projectName,
       () => {
         delete this.clients[uuid];
         this._refreshLists();

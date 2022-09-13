@@ -6,7 +6,7 @@ export function getPingEvent(counter) {
   }
 }
 
-let systemSubTypes = ["TOKEN_EXPIRED", "NO_ACCESS_TOKEN", "NO_CONNECTION", "STREAM_START", "STREAM_CLOSED"];
+let systemSubTypes = ["TOKEN_EXPIRED", "INVALID_ACCESS_TOKEN", "NO_ACCESS_TOKEN", "NO_CONNECTION", "STREAM_START", "STREAM_CLOSED"];
 export function getSystemEvent(subtype = systemSubTypes[0], code = 10, message = "Testing") {
   return {
     type:    "system",
@@ -22,6 +22,7 @@ export function getMultiSwitchCrownstoneEvent(sphereId) : MultiSwitchCrownstoneE
     subType:     "multiSwitch",
     sphere:      getSphereData(sphereId),
     switchData:  [getCrownstoneSwitchCommand(), getCrownstoneSwitchCommand()] as any,
+    sequenceTime: {timestamp: 100, counter: 2}
   }
 }
 

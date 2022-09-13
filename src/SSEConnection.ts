@@ -16,16 +16,18 @@ export class SSEConnection {
   _destroyed = false;
   expirationDate : number
   uuid : string;
+  projectName: string;
 
   cleanCallback : () => void;
 
-  constructor(accessToken : string, request: Request, response : Response, accessModel: AccessModel, uuid: string, cleanCallback: () => void) {
+  constructor(accessToken : string, request: Request, response : Response, accessModel: AccessModel, uuid: string, projectName: string, cleanCallback: () => void) {
     this.accessToken   = accessToken;
     this.accessModel   = accessModel;
     this.request       = request;
     this.response      = response;
     this.cleanCallback = cleanCallback;
     this.uuid          = uuid;
+    this.projectName   = projectName;
 
     this.expirationDate = new Date(accessModel.createdAt).valueOf() + 1000*accessModel.ttl;
 
@@ -42,7 +44,7 @@ export class SSEConnection {
     }, 30000);
 
     if (this._checkIfTokenIsExpired()) {
-      console.info(this.uuid, "Token has expired at", new Date(this.expirationDate).toISOString());
+      console.info(this.uuid, "Token has expired at", new Date(this.expirationDate).toISOString(), "source:", this.projectName);
       this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
       return;
     }
@@ -72,8 +74,9 @@ export class SSEConnection {
 
       try {
         this.response.end(message);
-      } catch (err) {
-        console.error("Tried to send a message after ending.")
+      }
+      catch (err) {
+        console.error("Tried to send a message after ending. Source:", this.projectName);
       }
     }
   }

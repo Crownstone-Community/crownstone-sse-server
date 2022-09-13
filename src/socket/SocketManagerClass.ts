@@ -91,8 +91,9 @@ export class SocketManagerClass {
         reject(errors.couldNotVerifyToken);
       }, 10000);
 
-      // request the token to be checked, and a accessmodel returned
+      // request the token to be checked, and an accessmodel returned
       this.socket.emit(requestType, token, (reply : any) => {
+        console.log(requestType, token, reply)
         clearTimeout(tokenValidityCheckTimeout);
         // if we have already timed out, ignore any response.
         if (responseValid === false) { return; }

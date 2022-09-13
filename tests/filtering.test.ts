@@ -14,7 +14,7 @@ test("test *all* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) })
@@ -35,7 +35,7 @@ test("test *user_location* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
@@ -62,7 +62,7 @@ test("test *stone_information* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
@@ -85,7 +85,7 @@ test("test *sphere_information* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
@@ -103,7 +103,7 @@ test("test *switch_stone* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
@@ -120,7 +120,7 @@ test("test *location_information* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
@@ -137,7 +137,7 @@ test("test *user_information* scopes", () => {
   let res = getMockedResponse()
 
   // @ts-ignore
-  dispatcher.addClient("myAccessToken", req, res, accessModel);
+  dispatcher.addClient("myAccessToken", 'unittest', req, res, accessModel);
 
   let allEvents = getAllDataEvents(sphereId, userId);
   allEvents.forEach((e) => { dispatcher.dispatch(e) });
