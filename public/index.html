@@ -110,7 +110,7 @@
             if (eventSource !== null) {
               eventSource.close();
             }
-            eventSource = new EventSource("/sse?accessToken=" + token);
+            eventSource = new EventSource("/sse?accessToken=" + token + "&projectName=event.crownstone.rocks");
             eventSource.onopen = function() {
               textArea.innerHTML = "Ready! Messages will come in as events are triggered!\n"
             };
