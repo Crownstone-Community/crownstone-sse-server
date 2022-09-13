@@ -79,9 +79,8 @@ export class SocketManagerClass {
     return this.socket.connected;
   }
 
-  _isValidToken(token: string, requestType: string) : Promise<AccessModel | false> {
-    return new Promise((resolve, reject) => {
-
+  _isValidToken(token: string, requestType: string) : Promise<AccessModel> {
+    return new Promise<AccessModel>((resolve, reject) => {
       // in case we can not get the token resolved in time, timeout.
       let responseValid = true;
       let tokenValidityCheckTimeout = setTimeout(() => {
@@ -93,7 +92,6 @@ export class SocketManagerClass {
 
       // request the token to be checked, and an accessmodel returned
       this.socket.emit(requestType, token, (reply : any) => {
-        console.log(requestType, token, reply)
         clearTimeout(tokenValidityCheckTimeout);
         // if we have already timed out, ignore any response.
         if (responseValid === false) { return; }
@@ -110,10 +108,10 @@ export class SocketManagerClass {
           reject(errors.invalidResponse);
         }
       })
-    })
+    });
   }
 
-  isValidToken(token: string) : Promise<AccessModel | false> {
+  isValidToken(token: string) : Promise<AccessModel> {
     if (token.length > 32) {
       return this.isValidAccessToken(token);
     }
@@ -122,11 +120,11 @@ export class SocketManagerClass {
     }
   }
 
-  isValidAccessToken(token: string) : Promise<AccessModel | false>{
+  isValidAccessToken(token: string) : Promise<AccessModel>{
     return this._isValidToken(token, protocolTopics.requestForAccessTokenCheck);
   }
 
-  isValidOauthToken(token: string) : Promise<AccessModel | false>{
+  isValidOauthToken(token: string) : Promise<AccessModel>{
     return this._isValidToken(token, protocolTopics.requestForOauthTokenCheck);
   }
 }

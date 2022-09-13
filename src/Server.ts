@@ -90,16 +90,9 @@ app.get('/sse', async function(req : Request, res : Response) {
     return res.end();
   }
 
-  if (validationResult === false) {
-    console.warn("Request received without VALID access token! Source:", projectName);
-    return res.end(EventGenerator.getErrorEvent(401,"INVALID_ACCESS_TOKEN", "No valid accessToken provided..."));
-  }
-  else {
-    res.write(EventGenerator.getStartEvent());
-
-    // @ts-ignore
-    EventDispatcher.addClient(accessToken, projectName, req, res, validationResult);
-  }
+  res.write(EventGenerator.getStartEvent());
+  // @ts-ignore
+  EventDispatcher.addClient(accessToken, projectName, req, res, validationResult);
 })
 
 
