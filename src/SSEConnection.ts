@@ -33,8 +33,7 @@ export class SSEConnection {
 
     // A HTTP connection times out after 2 minutes. To avoid this, we send keep alive messages every 30 seconds
     this.keepAliveTimer = setInterval(() => {
-      // this is not used anymore since we need the ping in node environment which does not show these messages.
-      // this.response.write(':ping\n\n');
+      if (this.isTokenExpired()) { return; }
 
       let pingEvent = { type:"ping",counter: this.count++ }
       this._transmit("data:" + JSON.stringify(pingEvent) + "\n\n");
@@ -43,11 +42,7 @@ export class SSEConnection {
       this.response.flushHeaders()
     }, 30000);
 
-    if (this._checkIfTokenIsExpired()) {
-      console.info(this.uuid, "Token has expired at", new Date(this.expirationDate).toISOString(), "source:", this.projectName);
-      this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
-      return;
-    }
+    if (this.isTokenExpired()) { return; }
 
     // generate a filter based on the scope permissions.
     this.generateFilterFromScope();
@@ -59,9 +54,20 @@ export class SSEConnection {
     this.connected = true;
   }
 
+
+  isTokenExpired() : boolean {
+    if (!this._checkIfTokenIsExpired()) { return false; }
+
+    console.info(this.uuid, "Token has expired at", new Date(this.expirationDate).toISOString(), "source:", this.projectName);
+    this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
+    return true;
+  }
+
+
   generateFilterFromScope() {
     this.scopeFilter = generateFilterFromScope(this.accessModel.scopes, this.accessModel.userId);
   }
+
 
   destroy(message = "") {
     if (this._destroyed == false) {
@@ -82,9 +88,7 @@ export class SSEConnection {
   }
 
   dispatch(dataStringified: string, eventData: SseDataEvent) {
-    if (this._checkIfTokenIsExpired()) {
-      return this.destroy(EventGenerator.getErrorEvent(401, "TOKEN_EXPIRED", "Token Expired."));
-    }
+    if (this.isTokenExpired()) { return; }
 
     if (checkScopePermissions(this.scopeFilter, eventData)) {
       this._transmit("data:" + dataStringified + "\n\n");
