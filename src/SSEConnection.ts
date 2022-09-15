@@ -30,6 +30,7 @@ export class SSEConnection {
     this.projectName   = projectName;
 
     this.expirationDate = new Date(accessModel.createdAt).valueOf() + 1000*accessModel.ttl;
+    console.log(this.uuid, "Starting SSE connection from ", projectName, "with token:", accessToken);
 
     // A HTTP connection times out after 2 minutes. To avoid this, we send keep alive messages every 30 seconds
     this.keepAliveTimer = setInterval(() => {
@@ -39,7 +40,7 @@ export class SSEConnection {
       this._transmit("data:" + JSON.stringify(pingEvent) + "\n\n");
 
       // if we are going to use the compression lib for express, we need to flush after a write.
-      this.response.flushHeaders()
+      this.response.flushHeaders();
     }, 30000);
 
     if (this.isTokenExpired()) { return; }

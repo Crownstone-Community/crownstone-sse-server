@@ -77,7 +77,7 @@ app.get('/sse', async function(req : Request, res : Response) {
 
   let validationResult;
   try {
-    validationResult = await SocketManager.isValidToken(accessToken)
+    validationResult = await SocketManager.isValidToken(accessToken);
   }
   catch (err) {
     console.log("Error in SocketManager.isValidToken Source:", projectName, err)
