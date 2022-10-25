@@ -49,6 +49,11 @@ app.get('/debug', function(req : Request, res : Response) {
 })
 
 
+app.get('/hi', function(req : Request, res : Response) {
+  res.end(JSON.stringify({hi: "sse"}));
+})
+
+
 app.get('/sse', async function(req : Request, res : Response) {
   const accessToken = extractToken(req);
   const projectName = getProjectName(req);
